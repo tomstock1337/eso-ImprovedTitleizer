@@ -1,8 +1,8 @@
 local Addon = {}
-Addon.Name = "kyoTitleizer"
-Addon.DisplayName = "|cFF5FF5Kyoma's|r Titleizer"
-Addon.Author = "|cFF5FF5Kyoma|r"
-Addon.Version = "2.0"
+Addon.Name = "ImprovedTitleizer"
+Addon.DisplayName = "ImprovedTitleizer"
+Addon.Author = "tomstock"
+Addon.Version = "1.0"
 
 local AVA_SORT_BY_RANK =
 {
@@ -16,7 +16,7 @@ local function spairs(t, order)
     for k in pairs(t) do keys[#keys+1] = k end
 
     -- if order function given, sort by it by passing the table and keys a, b,
-    -- otherwise just sort the keys 
+    -- otherwise just sort the keys
     if order then
         table.sort(keys, function(a,b) return order(t, a, b) end)
     else
@@ -36,17 +36,17 @@ end
 --These are actually their respective achievementIds
 local AchievmentIds =
 {
-	["AvA"] = 
+	["AvA"] =
 	{
-		 92, --Volunteer
-		 93, --Recruit
-		 94, --Tyro
-		 95, --Legionary
-		 96, --Veteran
-		 97, --Corporal
-		 98, --Sergeant
+		92, --Volunteer
+		93, --Recruit
+		94, --Tyro
+		95, --Legionary
+		96, --Veteran
+		97, --Corporal
+		98, --Sergeant
 		706, --First Sergeant
-		 99, --Lieutenant
+		99, --Lieutenant
 		100, --Captain
 		101, --Major
 		102, --Centurion
@@ -65,7 +65,7 @@ local AchievmentIds =
 		705, --Grand Overlord
 	},
 
-	["BG"] = 
+	["BG"] =
 	{
 		1918, -- [Paragon] Paragon
 		1915, -- [Battleground Butcher] Battleground Butcher
@@ -82,7 +82,7 @@ local AchievmentIds =
 	},
 
 }
-local AvATitles 
+local AvATitles
 local AvATitlesF
 local TitleCats = {} -- short for categories!! (and because I like cats)
 
@@ -121,7 +121,7 @@ local function InitializeTitles()
 		end
 
 		for j=1,n do
-			local s,a = GetAchievementSubCategoryInfo(i,j) 
+			local s,a = GetAchievementSubCategoryInfo(i,j)
 			for k=1,a do
 				CheckAchievementsInLine(GetAchievementId(i,j,k))
 			end
@@ -135,7 +135,7 @@ local function InitializeTitles()
 		local _, titleName = GetAchievementRewardTitle(id)
 		AvATitles[titleName] = i
 	end
-	
+
 	AvATitlesF = {}
 	for titleName, rank in pairs(AvATitles) do
 		AvATitlesF[titleName] = "|t28:28:"..GetAvARankIcon(rank*2).."|t " .. titleName
@@ -156,9 +156,9 @@ end
 
 local function OnLoad(eventCode, name)
 	if name ~= Addon.Name then return end
-	
+
 	InitializeTitles()
-	
+
 	local LSM = LibStub("LibScrollableMenu")
 
 	local orgAddDropdownRow = STATS.AddDropdownRow
@@ -182,7 +182,7 @@ local function OnLoad(eventCode, name)
 	local function ComboBoxSortHelper(item1, item2, comboBoxObject, sortKey, sortType, sortOrder)
 		return ZO_TableOrderingFunction(item1, item2, sortKey or "name", sortType or comboBoxObject.m_sortType, sortOrder or comboBoxObject.m_sortOrder)
 	end
-	
+
 	local function UpdateTitleDropdownTitles(self, dropdown)
 		--[[ original code
 		dropdown:ClearItems()
@@ -196,19 +196,19 @@ local function OnLoad(eventCode, name)
 
 		self:UpdateTitleDropdownSelection(dropdown)
 		--]]
-		
+
 		-- new code
 		dropdown:ClearItems()
 		dropdown:AddItem(ZO_ComboBox:CreateItemEntry(GetString(SI_STATS_NO_TITLE), function() SelectTitle(nil) end), ZO_COMBOBOX_SUPRESS_UPDATE)
-        
+
 		local function stripMarkup(str)
 			return str:gsub("|[Cc]%x%x%x%x%x%x", ""):gsub("|[Rr]", "")
 		end
-		
+
 		local ownedTitles = {}
 		local doonce = false
 		local hasSubmenus = false
-        
+
 		local mainItems = {}
 		local subItems = {}
 		for i=1, GetNumTitles() do
@@ -248,7 +248,7 @@ local function OnLoad(eventCode, name)
 			i = i + 1
 		end
 		-- add divider below last submenu if there is more
-		if i <= #mainItems and hasSubmenus then 
+		if i <= #mainItems and hasSubmenus then
 			table.insert(mainItems, i, {name=LSM.DIVIDER})
 		end
 		dropdown:AddItems(mainItems)
@@ -265,10 +265,10 @@ local function OnLoad(eventCode, name)
 	control.combobox = control:GetNamedChild("Dropdown")
 	control.scrollHelper = LSM.ScrollableDropdownHelper:New(TMP42UI, control, 10) -- do not alter parent of dropdown
 	control.scrollHelper.OnShow = function() end
-	
+
 	local dropdown = control.dropdown
 	dropdown:SetSortsItems(false)
-	
+
 	local checks = {}
 	local function SetChecked(checked, data)
 		df("SetChecked >> %s -> %s", data.name, tostring(checked))
@@ -277,13 +277,13 @@ local function OnLoad(eventCode, name)
 	local function GetChecked(data)
 		return checks[data.id]
 	end
-	
+
 	local function DummyCallback() end
-	
+
 	local function OnSelected(dropdown, name, item, selectionChanged)
 		df("Selected %s", name)
 	end
-	
+
 	local function GetTooltip(data)
 		--df("GetTooltip >> %s (%s)", data.name, control:GetName())
 		if not control.scrollHelper then
@@ -291,7 +291,7 @@ local function OnLoad(eventCode, name)
 		end
 		return "Tooltip ".. data.id
 	end
-	
+
 	local function GetEntries(data)
 		--df("GetEntries >> %s (%s)", data.name, control:GetName())
 		if not control.scrollHelper then
@@ -299,7 +299,7 @@ local function OnLoad(eventCode, name)
 		end
 		return data.content
 	end
-	
+
 	local mainItems = {}
 	local maxDepth = 4
 	local index = 0
@@ -307,7 +307,7 @@ local function OnLoad(eventCode, name)
 		local content = {}
 		for i=1, math.random(2, 13) do
 			index = index + 1
-			if checked then 
+			if checked then
 				table.insert(content, {name="Entry "..index, id=index, checked=GetChecked, callback=SetChecked})
 			else
 				table.insert(content, {name="Entry "..index, id=index, tooltip=GetTooltip, callback=OnSelected})
@@ -326,18 +326,18 @@ local function OnLoad(eventCode, name)
 	mainItems = CreateDummyContent(1)
 	dropdown:ClearItems()
 	dropdown:AddItems(mainItems)
-	
+
 	SLASH_COMMANDS["/kyo"] = function()
 		index = 0
 		local items = CreateDummyContent(1)
 		titlesRow.dropdown:ClearItems()
 		titlesRow.dropdown:AddItems(items)
 	end
-	
+
 	--]]
 
 	EVENT_MANAGER:UnregisterForEvent(Addon.Name, EVENT_ADD_ON_LOADED)
 end
 EVENT_MANAGER:RegisterForEvent(Addon.Name, EVENT_ADD_ON_LOADED, OnLoad)
 
-KYO_TITLEIZER = Addon
+IMPROVEDTITLEIZER = Addon

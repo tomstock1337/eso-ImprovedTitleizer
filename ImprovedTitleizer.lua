@@ -34,7 +34,7 @@ local function spairs(t, order)
 end
 
 --These are actually their respective achievementIds
-local AchievmentIds =
+local AchievmentIdsCategories =
 {
 	["AvA"] =
 	{
@@ -80,6 +80,16 @@ local AchievmentIds =
 		1907, -- [Grand Standard-Guardian] Standard-Guardian
 		1921, -- [Quadruple Kill] The Merciless
 	},
+	["TOT"] = {
+		3349,
+		3350,
+		3351,
+		3352,
+		3353,
+		3354,
+		3355,
+		3356,
+	},
 
 }
 local AvATitles
@@ -108,6 +118,7 @@ local GetTitle                           = GetTitle -- I want original titles
 --Usage: local strTitle GetTitle(achievementId)
 
 local function InitializeTitles()
+	local debug = false
 
 	local function CheckAchievementsInLine(id)
 		--Go through every achievement looking for if a title exists for it.
@@ -140,7 +151,7 @@ local function InitializeTitles()
 
 	AvATitles = {}
 	--grab AvA titles from achievements
-	for i, id in ipairs(AchievmentIds["AvA"]) do
+	for i, id in ipairs(AchievmentIdsCategories["AvA"]) do
 		local _, titleName = GetAchievementRewardTitle(id)
 		AvATitles[titleName] = i
 	end
@@ -151,7 +162,7 @@ local function InitializeTitles()
 	end
 
 	local header
-	for desc, section in pairs(AchievmentIds) do
+	for desc, section in pairs(AchievmentIdsCategories) do
 		for _, id in ipairs(section) do
 			if not header then
 				header = GetAchievementSubCategoryInfo(GetCategoryInfoFromAchievementId(id))
@@ -187,7 +198,6 @@ local function OnLoad(eventCode, name)
 	end
 
 	local function UpdateTitleDropdownTitles(self, dropdown)
-		-- new code
 		dropdown:ClearItems()
 		dropdown:AddItem(ZO_ComboBox:CreateItemEntry(GetString(SI_STATS_NO_TITLE), function() SelectTitle(nil) end), ZO_COMBOBOX_SUPRESS_UPDATE)
 
@@ -209,13 +219,18 @@ local function OnLoad(eventCode, name)
 			if header ~= nil then
 				hasSubmenus = true
 				subItems[header] = subItems[header] or {}
-				table.insert(subItems[header], {name=AvATitlesF[title] or title, rank=AvATitles[title] or 0, callback=function() SelectTitle(i) end})
+				if debug == true then
+					table.insert(subItems[header], {name=AvATitlesF[title] or title, rank=AvATitles[title] or 0, callback=function() SelectTitle(i) end,tooltip=title.." "..i})
+				else table.insert(subItems[header], {name=AvATitlesF[title] or title, rank=AvATitles[title] or 0, callback=function() SelectTitle(i) end})
+				end
 			else
-				table.insert(mainItems, {name=title, callback=function() SelectTitle(i) end})
+				if debug == true then
+					table.insert(mainItems, {name=title, callback=function() SelectTitle(i) end,tooltip=title.." "..i})
+				else table.insert(mainItems, {name=title, callback=function() SelectTitle(i) end})
+				end
 			end
 		end
 		table.sort(mainItems, function(item1, item2) return ComboBoxSortHelper(item1, item2, dropdown) end)
-
 		--[[ insert unowned AvA titles
 		for title, rank in pairs(AvATitles) do
 			local header = TitleCats[title]
@@ -255,3 +270,26 @@ end
 EVENT_MANAGER:RegisterForEvent(Addon.Name, EVENT_ADD_ON_LOADED, OnLoad)
 
 IMPROVEDTITLEIZER = Addon
+
+SLASH_COMMANDS["/dumptitles"] = function()
+	for i=1,GetNumAchievementCategories() do
+		local categoryName,numSubCategories,numAchievements, earnedPoints, totalPoints = GetAchievementCategoryInfo(i)
+		d("CatName: "..categoryName)
+		for j=1,numAchievements do
+			local id = GetAchievementId(i,nil,j)
+			if (GetAchievementRewardTitle(id)) then
+				d("#"..id.." "..GetAchievementLink(id).." "..select(2, GetAchievementRewardTitle(id)))
+			end
+		end
+
+		for j=1,numSubCategories do
+			local subCategoryName,subNumAchievements = GetAchievementSubCategoryInfo(i,j)
+			for k=1,subNumAchievements do
+				local id = GetAchievementId(i,j,k)
+				if (GetAchievementRewardTitle(id)) then
+					d("#"..id.." "..GetAchievementLink(id).." "..select(2, GetAchievementRewardTitle(id)))
+				end
+			end
+		end
+	end
+end

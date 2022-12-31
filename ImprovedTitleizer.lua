@@ -90,18 +90,27 @@ local AchievementToTitle = {}
 local TitleToAchievement = {}
 
 local GetNumAchievementCategories        = GetNumAchievementCategories
+--Usage: local numAchieveCategory = GetNumAchievementCategories()
 local GetAchievementCategoryInfo         = GetAchievementCategoryInfo
+--Usage: local categoryName, numSubCategories, numAchievements, earnedPoints, totalPoints = GetAchievementCategoryInfo(categoryIndex)
 local GetFirstAchievementInLine          = GetFirstAchievementInLine
+--Usage: local firstAchievementId = GetFirstAchievementInLine(achievementID)
 local GetAchievementRewardTitle          = GetAchievementRewardTitle
+--Usage: local hasRewardTitle, titleName = GetAchievementRewardTitle(achievementId)
 local GetNextAchievementInLine           = GetNextAchievementInLine
+--Usage: nextAchievementId = GetNextAchievementInLine(achievementId)
 local GetAchievementSubCategoryInfo      = GetAchievementSubCategoryInfo
+--Usage: local subCategoryName, subNumAchievements = GetAchievementSubCategoryInfo(categoryIndex, subCategoryIndex)
 local GetAchievementId                   = GetAchievementId
 
+--Usage: achievementId = GetAchievementId(categoryIndex, subcategoryIndex, achievementIndex)
 local GetTitle                           = GetTitle -- I want original titles
+--Usage: local strTitle GetTitle(achievementId)
 
 local function InitializeTitles()
 
 	local function CheckAchievementsInLine(id)
+		--Go through every achievement looking for if a title exists for it.
 		local firstId = GetFirstAchievementInLine(id)
 		id = firstId > 0 and firstId or id
 		while id > 0 do
@@ -166,12 +175,6 @@ local function OnLoad(eventCode, name)
 		local control = orgAddDropdownRow(self, rowName)
 		control.combobox = control:GetNamedChild("Dropdown")
 		control.scrollHelper = LSM.ScrollableDropdownHelper:New(self.control, control, 16)
-		-- handle scene fading
-		--local function OnStateChange(oldState, newState)
-		--	if newState == SCENE_HIDING then
-		--		control.scrollHelper:DoHide()
-		--	end
-		--end
 		STATS_SCENE:RegisterCallback("StateChange", OnStateChange)
 		control.scrollHelper.OnShow = function() end --don't change parenting
 
@@ -184,19 +187,6 @@ local function OnLoad(eventCode, name)
 	end
 
 	local function UpdateTitleDropdownTitles(self, dropdown)
-		--[[ original code
-		dropdown:ClearItems()
-
-		dropdown:AddItem(ZO_ComboBox:CreateItemEntry(GetString(SI_STATS_NO_TITLE), function() SelectTitle(nil) end), ZO_COMBOBOX_SUPRESS_UPDATE)
-		for i=1, GetNumTitles() do
-			dropdown:AddItem(ZO_ComboBox:CreateItemEntry(zo_strformat(GetTitle(i), GetRawUnitName("player")) , function() SelectTitle(i) end), ZO_COMBOBOX_SUPRESS_UPDATE)
-		end
-
-		dropdown:UpdateItems()
-
-		self:UpdateTitleDropdownSelection(dropdown)
-		--]]
-
 		-- new code
 		dropdown:ClearItems()
 		dropdown:AddItem(ZO_ComboBox:CreateItemEntry(GetString(SI_STATS_NO_TITLE), function() SelectTitle(nil) end), ZO_COMBOBOX_SUPRESS_UPDATE)
@@ -259,82 +249,6 @@ local function OnLoad(eventCode, name)
 	if STATS and STATS.UpdateTitleDropdownTitles then
 		STATS.UpdateTitleDropdownTitles = UpdateTitleDropdownTitles
 	end
-
-	--[[ test code
-	local control = TMP42UI:GetNamedChild("Row")
-	control.combobox = control:GetNamedChild("Dropdown")
-	control.scrollHelper = LSM.ScrollableDropdownHelper:New(TMP42UI, control, 10) -- do not alter parent of dropdown
-	control.scrollHelper.OnShow = function() end
-
-	local dropdown = control.dropdown
-	dropdown:SetSortsItems(false)
-
-	local checks = {}
-	local function SetChecked(checked, data)
-		df("SetChecked >> %s -> %s", data.name, tostring(checked))
-		checks[data.id] = checked
-	end
-	local function GetChecked(data)
-		return checks[data.id]
-	end
-
-	local function DummyCallback() end
-
-	local function OnSelected(dropdown, name, item, selectionChanged)
-		df("Selected %s", name)
-	end
-
-	local function GetTooltip(data)
-		--df("GetTooltip >> %s (%s)", data.name, control:GetName())
-		if not control.scrollHelper then
-			--d("NO HELPER")
-		end
-		return "Tooltip ".. data.id
-	end
-
-	local function GetEntries(data)
-		--df("GetEntries >> %s (%s)", data.name, control:GetName())
-		if not control.scrollHelper then
-
-		end
-		return data.content
-	end
-
-	local mainItems = {}
-	local maxDepth = 4
-	local index = 0
-	local function CreateDummyContent(depth, checked)
-		local content = {}
-		for i=1, math.random(2, 13) do
-			index = index + 1
-			if checked then
-				table.insert(content, {name="Entry "..index, id=index, checked=GetChecked, callback=SetChecked})
-			else
-				table.insert(content, {name="Entry "..index, id=index, tooltip=GetTooltip, callback=OnSelected})
-			end
-		end
-		if depth <= maxDepth then
-			table.insert(content, 1, {name=LSM.DIVIDER})
-			index = index + 1
-			table.insert(content, 1, {name="Submenu "..index, id=index, entries=CreateDummyContent(depth+1)})
-			index = index + 1
-			table.insert(content, 1, {name="Submenu "..index, id=index, content=CreateDummyContent(99, true), entries=GetEntries}) --never add entries for this submenu
-		end
-		--table.insert(content, 1, {name="A really long entry for testing.", checked=true, callback=DummyCallback})
-		return content
-	end
-	mainItems = CreateDummyContent(1)
-	dropdown:ClearItems()
-	dropdown:AddItems(mainItems)
-
-	SLASH_COMMANDS["/kyo"] = function()
-		index = 0
-		local items = CreateDummyContent(1)
-		titlesRow.dropdown:ClearItems()
-		titlesRow.dropdown:AddItems(items)
-	end
-
-	--]]
 
 	EVENT_MANAGER:UnregisterForEvent(Addon.Name, EVENT_ADD_ON_LOADED)
 end

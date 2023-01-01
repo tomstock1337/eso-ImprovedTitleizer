@@ -135,14 +135,14 @@ local function InitializeTitles()
 	end
 
 	for i=1,GetNumAchievementCategories() do
-		local s,n,a = GetAchievementCategoryInfo(i)
-		for j=1,a do
+		local categoryName, numSubCategories, numAchievements, earnedPoints, totalPoints = GetAchievementCategoryInfo(i)
+		for j=1,numAchievements do
 			CheckAchievementsInLine(GetAchievementId(i,nil,j))
 		end
 
-		for j=1,n do
-			local s,a = GetAchievementSubCategoryInfo(i,j)
-			for k=1,a do
+		for j=1,numSubCategories do
+			local subCategoryName, subNumAchievements = GetAchievementSubCategoryInfo(i, j)
+			for k=1,subNumAchievements do
 				CheckAchievementsInLine(GetAchievementId(i,j,k))
 			end
 		end
@@ -152,7 +152,7 @@ local function InitializeTitles()
 	AvATitles = {}
 	--grab AvA titles from achievements
 	for i, id in ipairs(AchievmentIdsCategories["AvA"]) do
-		local _, titleName = GetAchievementRewardTitle(id)
+		local hasRewardTitle, titleName = GetAchievementRewardTitle(id)
 		AvATitles[titleName] = i
 	end
 
@@ -165,9 +165,10 @@ local function InitializeTitles()
 	for desc, section in pairs(AchievmentIdsCategories) do
 		for _, id in ipairs(section) do
 			if not header then
-				header = GetAchievementSubCategoryInfo(GetCategoryInfoFromAchievementId(id))
+				local subCategoryName, subNumAchievements = GetAchievementSubCategoryInfo(GetCategoryInfoFromAchievementId(id))
+				header = subCategoryName
 			end
-			local _, titleName = GetAchievementRewardTitle(id)
+			local hasRewardTitle, titleName = GetAchievementRewardTitle(id)
 			TitleCats[titleName] = header
 		end
 		header = nil
@@ -274,7 +275,7 @@ IMPROVEDTITLEIZER = Addon
 SLASH_COMMANDS["/dumptitles"] = function()
 	for i=1,GetNumAchievementCategories() do
 		local categoryName,numSubCategories,numAchievements, earnedPoints, totalPoints = GetAchievementCategoryInfo(i)
-		d("CatName: "..categoryName)
+		d("Category Name: "..categoryName)
 		for j=1,numAchievements do
 			local id = GetAchievementId(i,nil,j)
 			if (GetAchievementRewardTitle(id)) then

@@ -10,7 +10,6 @@
 ## APIVersion: 100026
 ## DependsOn: LibStub LibCustomMenu
 
-libs/LibStub/LibStub.lua
 libs/LibScrollableMenu/LibScrollableMenu.lua
 
 ImprovedTitleizer.lua

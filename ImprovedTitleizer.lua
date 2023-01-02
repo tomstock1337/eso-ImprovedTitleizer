@@ -118,7 +118,6 @@ local GetTitle                           = GetTitle -- I want original titles
 --Usage: local strTitle GetTitle(achievementId)
 
 local function InitializeTitles()
-	local debug = false
 
 	local function CheckAchievementsInLine(id)
 		--Go through every achievement looking for if a title exists for it.
@@ -199,6 +198,7 @@ local function OnLoad(eventCode, name)
 	end
 
 	local function UpdateTitleDropdownTitles(self, dropdown)
+		local debug = false
 		dropdown:ClearItems()
 		dropdown:AddItem(ZO_ComboBox:CreateItemEntry(GetString(SI_STATS_NO_TITLE), function() SelectTitle(nil) end), ZO_COMBOBOX_SUPRESS_UPDATE)
 

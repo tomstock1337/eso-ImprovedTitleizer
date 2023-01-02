@@ -262,8 +262,20 @@ local function OnLoad(eventCode, name)
 		self:UpdateTitleDropdownSelection(dropdown)
 	end
 
+	-- Old function from before 8.2.5
+	-- New function gets the selected item by string value, new function selects by index (which is scambled due to the sorting)
+	function UpdateTitleDropdownSelection(self, dropdown)
+    local currentTitleIndex = GetCurrentTitleIndex()
+    if currentTitleIndex then
+        dropdown:SetSelectedItemText(zo_strformat(GetTitle(currentTitleIndex), GetRawUnitName("player")))
+    else
+        dropdown:SetSelectedItemText(GetString(SI_STATS_NO_TITLE))
+    end
+	end
+
 	if STATS and STATS.UpdateTitleDropdownTitles then
 		STATS.UpdateTitleDropdownTitles = UpdateTitleDropdownTitles
+		STATS.UpdateTitleDropdownSelection = UpdateTitleDropdownSelection
 	end
 
 	EVENT_MANAGER:UnregisterForEvent(Addon.Name, EVENT_ADD_ON_LOADED)

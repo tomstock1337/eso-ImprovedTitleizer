@@ -287,7 +287,7 @@ IMPROVEDTITLEIZER = Addon
 SLASH_COMMANDS["/dumptitles"] = function()
 	for i=1,GetNumAchievementCategories() do
 		local categoryName,numSubCategories,numAchievements, earnedPoints, totalPoints = GetAchievementCategoryInfo(i)
-		d("Category Name: "..categoryName)
+		d("#=Category Name: "..categoryName)
 		for j=1,numAchievements do
 			local id = GetAchievementId(i,nil,j)
 			if (GetAchievementRewardTitle(id)) then
@@ -300,7 +300,7 @@ SLASH_COMMANDS["/dumptitles"] = function()
 			for k=1,subNumAchievements do
 				local id = GetAchievementId(i,j,k)
 				if (GetAchievementRewardTitle(id)) then
-					d("#"..id.." "..GetAchievementLink(id).." "..select(2, GetAchievementRewardTitle(id)))
+					d("##="..id.." "..GetAchievementLink(id).." <"..GetAchievementNameFromLink(GetAchievementLink(id)).."> "..select(2, GetAchievementRewardTitle(id)))
 				end
 			end
 		end

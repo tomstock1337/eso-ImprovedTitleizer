@@ -36,68 +36,72 @@ end
 --These are actually their respective achievementIds
 local AchievmentIdsCategories =
 {
-	["AvA"] =
 	{
-		92, --Volunteer
-		93, --Recruit
-		94, --Tyro
-		95, --Legionary
-		96, --Veteran
-		97, --Corporal
-		98, --Sergeant
-		706, --First Sergeant
-		99, --Lieutenant
-		100, --Captain
-		101, --Major
-		102, --Centurion
-		103, --Colonel
-		104, --Tribune
-		105, --Brigadier
-		106, --Prefect
-		107, --Praetorian
-		108, --Palatine
-		109, --August Palatine
-		110, --Legate
-		111, --General
-		112, --Warlord
-		113, --Grand Warlord
-		114, --Overlord
-		705, --Grand Overlord
+		Name="Alliance War",
+		Entries=
+		{
+			{ID=92,Rank=1}, --Volunteer
+			{ID=93,Rank=2}, --Recruit
+			{ID=94,Rank=3}, --Tyro
+			{ID=95,Rank=4}, --Legionary
+			{ID=96,Rank=5}, --Veteran
+			{ID=97,Rank=6}, --Corporal
+			{ID=98,Rank=7}, --Sergeant
+			{ID=706,Rank=8}, --First Sergeant
+			{ID=99,Rank=9}, --Lieutenant
+			{ID=100,Rank=10}, --Captain
+			{ID=101,Rank=11}, --Major
+			{ID=102,Rank=12}, --Centurion
+			{ID=103,Rank=13}, --Colonel
+			{ID=104,Rank=14}, --Tribune
+			{ID=105,Rank=15}, --Brigadier
+			{ID=106,Rank=16}, --Prefect
+			{ID=107,Rank=17}, --Praetorian
+			{ID=108,Rank=18}, --Palatine
+			{ID=109,Rank=19}, --August Palatine
+			{ID=110,Rank=20}, --Legate
+			{ID=111,Rank=21}, --General
+			{ID=112,Rank=22}, --Warlord
+			{ID=113,Rank=23}, --Grand Warlord
+			{ID=114,Rank=24}, --Overlord
+			{ID=705,Rank=25}, --Grand Overlord
+		},
 	},
-
-	["BG"] =
 	{
-		1918, -- [Paragon] Paragon
-		1915, -- [Battleground Butcher] Battleground Butcher
-		1913, -- [Grand Champion] Grand Champion
-		1916, -- [Tactician] Tactician
-		1919, -- [Triple Threat] Relic Runner
-		1910, -- [Conquering Hero] Conquering Hero
-		1895, -- [Pit Hero] Bloodletter
-		1901, -- [Grand Relic Guardian] Relic Guardian
-		1898, -- [Grand Relic Hunter] Relic Hunter
-		1904, -- [Grand Standard-Bearer] Standard-Bearer
-		1907, -- [Grand Standard-Guardian] Standard-Guardian
-		1921, -- [Quadruple Kill] The Merciless
+		Name="Battlegrounds",
+		Entries=
+		{
+			{ID=1918}, -- [Paragon] Paragon
+			{ID=1915}, -- [Battleground Butcher] Battleground Butcher
+			{ID=1913}, -- [Grand Champion] Grand Champion
+			{ID=1916}, -- [Tactician] Tactician
+			{ID=1919}, -- [Triple Threat] Relic Runner
+			{ID=1910}, -- [Conquering Hero] Conquering Hero
+			{ID=1895}, -- [Pit Hero] Bloodletter
+			{ID=1901}, -- [Grand Relic Guardian] Relic Guardian
+			{ID=1898}, -- [Grand Relic Hunter] Relic Hunter
+			{ID=1904}, -- [Grand Standard-Bearer] Standard-Bearer
+			{ID=1907}, -- [Grand Standard-Guardian] Standard-Guardian
+			{ID=1921}, -- [Quadruple Kill] The Merciless
+		}
 	},
-	["TOT"] = {
-		3349,
-		3350,
-		3351,
-		3352,
-		3353,
-		3354,
-		3355,
-		3356,
-	},
-
+	{
+		Name="Tales of Tribute",
+		Entries={
+		{ID=3349, Rank=1}, -- Roister's Club Initiate
+		{ID=3350, Rank=2}, -- Roister's Club Trainee
+		{ID=3351, Rank=3}, -- Roister's Club Novice
+		{ID=3352, Rank=4}, -- Roister's Club Regular
+		{ID=3353, Rank=5}, -- Roister's Club Adept
+		{ID=3354, Rank=6}, -- Roister's Club Expert
+		{ID=3355, Rank=7}, -- Roister's Club Veteran
+		{ID=3356, Rank=8}, -- Roister's Club Master
+		}
+	}
 }
-local AvATitles
-local AvATitlesF
-local TitleCats = {} -- short for categories!! (and because I like cats)
 
-local AchievementToTitle = {}
-local TitleToAchievement = {}
+local AllTitles={};
+--{TitleID=id, CategoryID=categoryId, CategoryName=categoryName,SubCategoryID=subCategory,SubCategoryName=subCategoryName,HasTitle=hasTitle}
 
 local GetNumAchievementCategories        = GetNumAchievementCategories
 --Usage: local numAchieveCategory = GetNumAchievementCategories()
@@ -119,62 +123,37 @@ local GetTitle                           = GetTitle -- I want original titles
 
 local function InitializeTitles()
 
-	local function CheckAchievementsInLine(id)
+	local function CheckAchievementsInLine(id, categoryId, categoryName, subCategory, subCategoryName)
 		--Go through every achievement looking for if a title exists for it.
 		local firstId = GetFirstAchievementInLine(id)
 		id = firstId > 0 and firstId or id
 		while id > 0 do
 			local hasTitle, title = GetAchievementRewardTitle(id)
 			if hasTitle then
-				AchievementToTitle[id] = title
-				TitleToAchievement[title] = id
+				local achieveName = GetAchievementNameFromLink(GetAchievementLink(id))
+				table.insert(AllTitles,1,{TitleID=id,Title=title,CategoryID=categoryId, CategoryName=categoryName,SubCategoryID=subCategory,SubCategoryName=subCategoryName,HasTitle=hasTitle,AchievementName=achieveName},1);
 			end
 			id = GetNextAchievementInLine(id)
 		end
 	end
-
 	for i=1,GetNumAchievementCategories() do
 		local categoryName, numSubCategories, numAchievements, earnedPoints, totalPoints = GetAchievementCategoryInfo(i)
 		for j=1,numAchievements do
-			CheckAchievementsInLine(GetAchievementId(i,nil,j))
+			CheckAchievementsInLine(GetAchievementId(i,nil,j), i, categoryName)
 		end
 
 		for j=1,numSubCategories do
 			local subCategoryName, subNumAchievements = GetAchievementSubCategoryInfo(i, j)
 			for k=1,subNumAchievements do
-				CheckAchievementsInLine(GetAchievementId(i,j,k))
+				CheckAchievementsInLine(GetAchievementId(i,j,k), i, categoryName, j,subCategoryName)
 			end
 		end
 	end
 
-
-	AvATitles = {}
-	--grab AvA titles from achievements
-	for i, id in ipairs(AchievmentIdsCategories["AvA"]) do
-		local hasRewardTitle, titleName = GetAchievementRewardTitle(id)
-		AvATitles[titleName] = i
-	end
-
-	AvATitlesF = {}
-	for titleName, rank in pairs(AvATitles) do
-		AvATitlesF[titleName] = "|t28:28:"..GetAvARankIcon(rank*2).."|t " .. titleName
-	end
-
-	local header
-	for desc, section in pairs(AchievmentIdsCategories) do
-		for _, id in ipairs(section) do
-			if not header then
-				local subCategoryName, subNumAchievements = GetAchievementSubCategoryInfo(GetCategoryInfoFromAchievementId(id))
-				header = subCategoryName
-			end
-			local hasRewardTitle, titleName = GetAchievementRewardTitle(id)
-			TitleCats[titleName] = header
-		end
-		header = nil
-	end
 end
 
 local function OnLoad(eventCode, name)
+	local debug = true
 	if name ~= Addon.Name then return end
 
 	InitializeTitles()
@@ -202,62 +181,46 @@ local function OnLoad(eventCode, name)
 		dropdown:ClearItems()
 		dropdown:AddItem(ZO_ComboBox:CreateItemEntry(GetString(SI_STATS_NO_TITLE), function() SelectTitle(nil) end), ZO_COMBOBOX_SUPRESS_UPDATE)
 
-		local function stripMarkup(str)
-			return str:gsub("|[Cc]%x%x%x%x%x%x", ""):gsub("|[Rr]", "")
+		local menu = {}
+		local subMenus={}
+		for i,sub in pairs(AchievmentIdsCategories) do
+			subMenus[sub.Name]={Entries={}}
 		end
-
-		local ownedTitles = {}
-		local doonce = false
-		local hasSubmenus = false
-
-		local mainItems = {}
-		local subItems = {}
-		for i=1, GetNumTitles() do
-			local title = zo_strformat(GetTitle(i), GetRawUnitName("player"))
-			title = stripMarkup(title)
-			ownedTitles[title] = true
-			local header = TitleCats[title]
-			if header ~= nil then
-				hasSubmenus = true
-				subItems[header] = subItems[header] or {}
-				if debug == true then
-					table.insert(subItems[header], {name=AvATitlesF[title] or title, rank=AvATitles[title] or 0, callback=function() SelectTitle(i) end,tooltip=title.." "..i})
-				else table.insert(subItems[header], {name=AvATitlesF[title] or title, rank=AvATitles[title] or 0, callback=function() SelectTitle(i) end})
-				end
-			else
-				if debug == true then
-					table.insert(mainItems, {name=title, callback=function() SelectTitle(i) end,tooltip=title.." "..i})
-				else table.insert(mainItems, {name=title, callback=function() SelectTitle(i) end})
+		for i,vTitle in pairs(AllTitles) do
+			local titlePlaced = false
+			local toolTip = vTitle.AchievementName.."\n"..vTitle.CategoryName
+			if debug==true then
+				toolTip = toolTip.."\n"..vTitle.TitleID
+			end
+			for k, vCategory in pairs(AchievmentIdsCategories) do
+				for j,q in pairs(vCategory.Entries) do
+					if vTitle.TitleID==q.ID then
+						table.insert(subMenus[vCategory.Name].Entries,{name=vTitle.Title, 0, callback=function() SelectTitle(vTitle.TitleID) end,tooltip=toolTip})
+						titlePlaced=true
+					end
 				end
 			end
-		end
-		table.sort(mainItems, function(item1, item2) return ComboBoxSortHelper(item1, item2, dropdown) end)
-		--[[ insert unowned AvA titles
-		for title, rank in pairs(AvATitles) do
-			local header = TitleCats[title]
-			if header ~= nil and not ownedTitles[title] then
-				subItems[header] = subItems[header] or {}
-				table.insert(subItems[header], {name=AvATitlesF[title] or title, rank=AvATitles[title] or 0, callback=function() end, disabled=true, tooltip = "Disabled Title"})
+			if(titlePlaced==false) then
+				table.insert(menu,{name=vTitle.Title, 0, callback=function() SelectTitle(vTitle.TitleID) end,tooltip=toolTip})
 			end
 		end
-		--]]
+		table.sort(menu, function(item1, item2) return ComboBoxSortHelper(item1, item2, dropdown) end)
 
 		local i = 1
-		for header, titles in spairs(subItems) do
-			table.sort(titles, function(item1, item2) return ComboBoxSortHelper(item1, item2, dropdown, "rank", AVA_SORT_BY_RANK) end)
-			table.insert(mainItems, i, {name=header, entries=titles})
+		for header, titles in spairs(subMenus) do
+			table.insert(menu, i, {name=header, entries=titles.Entries})
 			i = i + 1
 		end
 		-- add divider below "No Title" if there is more
-		if #mainItems > 0 then
-			table.insert(mainItems, 1, {name=LSM.DIVIDER})
+		if #menu > 0 then
+			table.insert(menu, 1, {name=LSM.DIVIDER})
 			i = i + 1
 		end
 		-- add divider below last submenu if there is more
-		if i <= #mainItems and hasSubmenus then
-			table.insert(mainItems, i, {name=LSM.DIVIDER})
+		if i <= #menu then
+			table.insert(menu, i, {name=LSM.DIVIDER})
 		end
-		dropdown:AddItems(mainItems)
+		dropdown:AddItems(menu)
 
 		self:UpdateTitleDropdownSelection(dropdown)
 	end

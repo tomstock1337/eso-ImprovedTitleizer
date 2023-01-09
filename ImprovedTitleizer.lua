@@ -88,14 +88,101 @@ local AchievmentIdsCategories =
 	{
 		Name="Tales of Tribute",
 		Entries={
-		{ID=3349, Rank=1}, -- Roister's Club Initiate
-		{ID=3350, Rank=2}, -- Roister's Club Trainee
-		{ID=3351, Rank=3}, -- Roister's Club Novice
-		{ID=3352, Rank=4}, -- Roister's Club Regular
-		{ID=3353, Rank=5}, -- Roister's Club Adept
-		{ID=3354, Rank=6}, -- Roister's Club Expert
-		{ID=3355, Rank=7}, -- Roister's Club Veteran
-		{ID=3356, Rank=8}, -- Roister's Club Master
+			{ID=3349, Rank=1}, -- Roister's Club Initiate
+			{ID=3350, Rank=2}, -- Roister's Club Trainee
+			{ID=3351, Rank=3}, -- Roister's Club Novice
+			{ID=3352, Rank=4}, -- Roister's Club Regular
+			{ID=3353, Rank=5}, -- Roister's Club Adept
+			{ID=3354, Rank=6}, -- Roister's Club Expert
+			{ID=3355, Rank=7}, -- Roister's Club Veteran
+			{ID=3356, Rank=8}, -- Roister's Club Master
+		}
+	},
+	{
+		Name="Skyshard Hunter",
+		Entries={
+			{ID=2516}, --Craglorn Skyshard Hunter
+			{ID=2513}, --Dominion Skyshard Hunter
+			{ID=2514}, --Covenant Skyshard Hunter
+			{ID=2515}, --Pact Skyshard Hunter
+			{ID=2517}, --Cyrodiil Skyshard Hunter
+		}
+	},
+	{
+		Name="Conqueror",
+		Entries={
+			{ID=1330}, --: The Flawless Conqueror -- Maelstrom Arena: Perfect Run ",
+			{ID=1305}, --: Stormproof -- Maelstrom Arena Conqueror ",
+			{ID=1699}, -- Jarl Maker -- Falkreath Hold Conqueror ",
+			{ID=1691}, -- Bane of Beastmen -- Bloodroot Forge Conqueror ",
+			{ID=2077}, -- Assistant Alienist -- Asylum Sanctorium Conqueror ",
+			{ID=1960}, -- Blackmarrow's Bane -- Fang Lair Conqueror ",
+			{ID=1976}, -- Peak Scaler -- Scalecaller Peak Conqueror ",
+			{ID=2163}, -- Huntmaster -- March of Sacrifices Conqueror ",
+			{ID=2153}, -- Silver Knight -- Moon Hunter Keep Conqueror ",
+			{ID=2363}, -- Blackrose Executioner -- Blackrose Prison Conqueror ",
+			{ID=2908}, -- Spiritblood Champion -- Vateshran Hollows Conqueror ",
+			{ID=1810}, -- Divayth Fyr's Coadjutor -- Halls of Fabrication Conqueror ",
+			{ID=2133}, -- Shadow Breaker -- Cloudrest Conqueror ",
+			{ID=2435}, -- Sunspire Saint -- Sunspire Conqueror ",
+			{ID=2734}, -- Kyne's Will -- Kyne's Aegis Conqueror ",
+			{ID=2987}, -- Ca-Uxith Warrior -- Rockgrove Conqueror ",
+			{ID=3244}, -- Seaborne Slayer -- Dreadsail Reef Conqueror ",
+			{ID=1474}, -- Shehai Shatterer -- Hel Ra Citadel Conqueror ",
+			{ID=1503}, -- Mageslayer -- Aetherian Archive Conqueror ",
+			{ID=1462}, -- Ophidian Overlord -- Sanctum Ophidia Conqueror ",
+			{ID=1140}, -- Boethiah's Scythe -- Dragonstar Arena Conqueror ",
+		}
+	},
+	{
+		Name="Savior",
+		Entries={
+			{ID=2941}, -- Guardian of the Reach -- Savior of the Reach ",
+			{ID=3501}, -- Guardian of Galen -- Savior of Galen ",
+			{ID=1868}, -- Savior of Morrowind -- Savior of Morrowind ",
+			{ID=2193}, -- Savior of Summerset -- Savior of Summerset ",
+			{ID=2509}, -- Savior of Elsweyr -- Savior of Elsweyr ",
+			{ID=2712}, -- Savior of Western Skyrim -- Savior of Western Skyrim ",
+			{ID=3047}, -- Savior of Blackwood -- Savior of Blackwood ",
+			{ID=3271}, -- Savior of High Isle -- Savior of High Isle ",
+			{ID=587}, -- Savior of Nirn -- Anchors Away ",
+		}
+	},
+	{
+		Name="Hero",
+		Entries={
+			{ID=2623}, -- Hero of the Dragonguard -- Hero of the Dragonguard ",
+			{ID=2913}, -- of the Undying Song -- Hero of the Unending Song ",
+			{ID=618}, -- Dominion Hero -- Hero of the Aldmeri Dominion ",
+			{ID=61}, -- Covenant Hero -- Hero of the Daggerfall Covenant ",
+			{ID=617}, -- Pact Hero -- Hero of the Ebonheart Pact ",
+			{ID=1248},-- Hero of Wrothgar -- Hero of Wrothgar ",
+			{ID=2049},-- Hero of Clockwork City -- Hero of Clockwork City ",
+			{ID=2331},-- Hero of Murkmire -- Hero of Murkmire ",
+			{ID=2939},-- Hero of Skyrim -- A Bridge Between Kingdoms ",
+			{ID=3145},-- Hero of Fargrave -- Hero of Fargrave ",
+		}
+	},
+	{
+		Name="Master",
+		Entries={
+			{ID=1383}, --Master Thief -- A Cutpurse Above ",
+			{ID=2620}, --Master Grappler -- Grappling Bow Pathfinder ",
+			{ID=2805}, --Master Historian -- Master Antiquarian ",
+			{ID=494}, --Master Angler -- Master Fisher ",
+			{ID=702}, --Master Wizard -- Arch-Mage ",
+		}
+	},
+	{
+		Name="Trial Trifectas",
+		Entries={
+			{ID=2087},-- Saintly Savior -- Perfect Purification
+			{ID=1838},-- Tick-Tock Tormentor -- Like Clockwork
+			{ID=2139},-- Gryphon Heart -- The Path to Alaxon
+			{ID=2467},-- Godslayer -- Godslayer of Sunspire
+			{ID=2740},-- Kyne's Wrath -- Stainless Siege-breaker
+			{ID=3003},-- Planesbreaker -- Soul Savior
+			{ID=3248},-- Soul of the Squall -- Fleet Queen's Foil
 		}
 	}
 }
@@ -132,7 +219,16 @@ local function InitializeTitles()
 			local hasTitle, title = GetAchievementRewardTitle(id)
 			if hasTitle then
 				local achieveName = GetAchievementNameFromLink(GetAchievementLink(id))
-				table.insert(AllTitles,1,{TitleID=id,Title=title,CategoryID=categoryId, CategoryName=categoryName,SubCategoryID=subCategory,SubCategoryName=subCategoryName,HasTitle=hasTitle,AchievementName=achieveName},1);
+				local playerHasTitle = false
+				local playerTitleIndex = -1
+				for j=1,GetNumTitles() do
+					if title == GetTitle(j) then
+						playerHasTitle = true
+						playerTitleIndex = j
+						break
+					end
+				end
+				table.insert(AllTitles,1,{AchievementID=id,TitleID=playerTitleIndex,Title=title,CategoryID=categoryId, CategoryName=categoryName,SubCategoryID=subCategory,SubCategoryName=subCategoryName,HasTitle=playerHasTitle,AchievementName=achieveName},1);
 			end
 			id = GetNextAchievementInLine(id)
 		end
@@ -194,21 +290,23 @@ local function OnLoad(eventCode, name)
 			subMenus[sub.Name]={Entries={}}
 		end
 		for i,vTitle in pairs(AllTitles) do
-			local titlePlaced = false
-			local toolTip = vTitle.AchievementName.."\n"..vTitle.CategoryName
-			if debug==true then
-				toolTip = toolTip.."\n"..vTitle.TitleID
-			end
-			for k, vCategory in pairs(AchievmentIdsCategories) do
-				for j,q in pairs(vCategory.Entries) do
-					if vTitle.TitleID==q.ID then
-						table.insert(subMenus[vCategory.Name].Entries,{name=(q.Icon or "")..vTitle.Title, rank=q.Rank or 0, callback=function() SelectTitle(vTitle.TitleID) end,tooltip=toolTip})
-						titlePlaced=true
+			if(vTitle.HasTitle) then
+				local titlePlaced = false
+				local toolTip = vTitle.AchievementName.."\n"..vTitle.CategoryName
+				if debug==true then
+					toolTip = toolTip.."\n"..vTitle.TitleID
+				end
+				for k, vCategory in pairs(AchievmentIdsCategories) do
+					for j,q in pairs(vCategory.Entries) do
+						if vTitle.AchievementID==q.ID then
+							table.insert(subMenus[vCategory.Name].Entries,{name=(q.Icon or "")..vTitle.Title, rank=q.Rank or 0, callback=function() SelectTitle(vTitle.TitleID) end,tooltip=toolTip})
+							titlePlaced=true
+						end
 					end
 				end
-			end
-			if(titlePlaced==false) then
-				table.insert(menu,{name=vTitle.Title, rank = 0, callback=function() SelectTitle(vTitle.TitleID) end,tooltip=toolTip})
+				if(titlePlaced==false) then
+					table.insert(menu,{name=vTitle.Title, rank = 0, callback=function() SelectTitle(vTitle.TitleID) end,tooltip=toolTip})
+				end
 			end
 		end
 		table.sort(menu, function(item1, item2) return ComboBoxSortHelper(item1, item2, dropdown) end)
@@ -256,24 +354,15 @@ EVENT_MANAGER:RegisterForEvent(Addon.Name, EVENT_ADD_ON_LOADED, OnLoad)
 IMPROVEDTITLEIZER = Addon
 
 SLASH_COMMANDS["/dumptitles"] = function()
-	for indxAchievementCategory=1,GetNumAchievementCategories() do
-		local categoryName,numSubCategories,numAchievements, earnedPoints, totalPoints = GetAchievementCategoryInfo(indxAchievementCategory)
-		d("#=Category Name: "..categoryName)
-		for jndxAchievement=1,numAchievements do
-			local idAchievement = GetAchievementId(indxAchievementCategory,nil,jndxAchievement)
-			if (GetAchievementRewardTitle(idAchievement)) then
-				d("#"..idAchievement.." "..GetAchievementLink(idAchievement).." "..select(2, GetAchievementRewardTitle(idAchievement)).." "..tostring(select(1, GetAchievementRewardTitle(idAchievement))))
-			end
-		end
-
-		for jndxSubCategory=1,numSubCategories do
-			local subCategoryName,subNumAchievements = GetAchievementSubCategoryInfo(indxAchievementCategory,jndxSubCategory)
-			for kndxSubAchievement=1,subNumAchievements do
-				local idAchievement = GetAchievementId(indxAchievementCategory,jndxSubCategory,kndxSubAchievement)
-				if (GetAchievementRewardTitle(idAchievement)) then
-					d("##="..idAchievement.." "..GetAchievementLink(idAchievement).." <"..GetAchievementNameFromLink(GetAchievementLink(idAchievement)).."> "..select(2, GetAchievementRewardTitle(idAchievement)).." "..tostring(select(1, GetAchievementRewardTitle(idAchievement))))
-				end
-			end
-		end
+	--{TitleID=id, CategoryID=categoryId, CategoryName=categoryName,SubCategoryID=subCategory,SubCategoryName=subCategoryName,HasTitle=hasTitle}
+	for i,vTitle in pairs(AllTitles) do
+		local output = ""
+		output = output..vTitle.TitleID.." "
+		output = output.."HasTitle: "..tostring(vTitle.HasTitle).." "
+		output = output.."Title: "..vTitle.Title.." "
+		output = output.."CategoryID: "..vTitle.CategoryID.." "
+		output = output.."CategoryName: "..vTitle.CategoryName.." "
+		output = output.."AchievementName: "..vTitle.AchievementName.." "
+		d(output)
 	end
 end

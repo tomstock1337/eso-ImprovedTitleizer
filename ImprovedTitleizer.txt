@@ -9,6 +9,7 @@
 ## Author: tomstock
 ## APIVersion: 100026
 ## DependsOn: LibStub LibCustomMenu
+## OptionalDependsOn: LibDebugLogger>=180
 
 libs/LibScrollableMenu/LibScrollableMenu.lua
 

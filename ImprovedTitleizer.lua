@@ -122,6 +122,7 @@ local GetTitle                           = GetTitle -- I want original titles
 --Usage: local strTitle GetTitle(achievementId)
 
 local function InitializeTitles()
+	--local logger = LibDebugLogger("ImprovedTitleizer")
 
 	local function CheckAchievementsInLine(id, categoryId, categoryName, subCategory, subCategoryName)
 		--Go through every achievement looking for if a title exists for it.
@@ -255,22 +256,22 @@ EVENT_MANAGER:RegisterForEvent(Addon.Name, EVENT_ADD_ON_LOADED, OnLoad)
 IMPROVEDTITLEIZER = Addon
 
 SLASH_COMMANDS["/dumptitles"] = function()
-	for i=1,GetNumAchievementCategories() do
-		local categoryName,numSubCategories,numAchievements, earnedPoints, totalPoints = GetAchievementCategoryInfo(i)
+	for indxAchievementCategory=1,GetNumAchievementCategories() do
+		local categoryName,numSubCategories,numAchievements, earnedPoints, totalPoints = GetAchievementCategoryInfo(indxAchievementCategory)
 		d("#=Category Name: "..categoryName)
-		for j=1,numAchievements do
-			local id = GetAchievementId(i,nil,j)
-			if (GetAchievementRewardTitle(id)) then
-				d("#"..id.." "..GetAchievementLink(id).." "..select(2, GetAchievementRewardTitle(id)))
+		for jndxAchievement=1,numAchievements do
+			local idAchievement = GetAchievementId(indxAchievementCategory,nil,jndxAchievement)
+			if (GetAchievementRewardTitle(idAchievement)) then
+				d("#"..idAchievement.." "..GetAchievementLink(idAchievement).." "..select(2, GetAchievementRewardTitle(idAchievement)).." "..tostring(select(1, GetAchievementRewardTitle(idAchievement))))
 			end
 		end
 
-		for j=1,numSubCategories do
-			local subCategoryName,subNumAchievements = GetAchievementSubCategoryInfo(i,j)
-			for k=1,subNumAchievements do
-				local id = GetAchievementId(i,j,k)
-				if (GetAchievementRewardTitle(id)) then
-					d("##="..id.." "..GetAchievementLink(id).." <"..GetAchievementNameFromLink(GetAchievementLink(id)).."> "..select(2, GetAchievementRewardTitle(id)))
+		for jndxSubCategory=1,numSubCategories do
+			local subCategoryName,subNumAchievements = GetAchievementSubCategoryInfo(indxAchievementCategory,jndxSubCategory)
+			for kndxSubAchievement=1,subNumAchievements do
+				local idAchievement = GetAchievementId(indxAchievementCategory,jndxSubCategory,kndxSubAchievement)
+				if (GetAchievementRewardTitle(idAchievement)) then
+					d("##="..idAchievement.." "..GetAchievementLink(idAchievement).." <"..GetAchievementNameFromLink(GetAchievementLink(idAchievement)).."> "..select(2, GetAchievementRewardTitle(idAchievement)).." "..tostring(select(1, GetAchievementRewardTitle(idAchievement))))
 				end
 			end
 		end

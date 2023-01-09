@@ -149,7 +149,13 @@ local function InitializeTitles()
 			end
 		end
 	end
-
+	for i,sub in pairs(AchievmentIdsCategories) do
+		if (sub.Name=="Alliance War") then
+			for j,rank in pairs(sub.Entries) do
+				rank.Icon="|t28:28:"..GetAvARankIcon(j*2).."|t "
+			end
+		end
+	end
 end
 
 local function OnLoad(eventCode, name)
@@ -195,19 +201,20 @@ local function OnLoad(eventCode, name)
 			for k, vCategory in pairs(AchievmentIdsCategories) do
 				for j,q in pairs(vCategory.Entries) do
 					if vTitle.TitleID==q.ID then
-						table.insert(subMenus[vCategory.Name].Entries,{name=vTitle.Title, 0, callback=function() SelectTitle(vTitle.TitleID) end,tooltip=toolTip})
+						table.insert(subMenus[vCategory.Name].Entries,{name=(q.Icon or "")..vTitle.Title, rank=q.Rank or 0, callback=function() SelectTitle(vTitle.TitleID) end,tooltip=toolTip})
 						titlePlaced=true
 					end
 				end
 			end
 			if(titlePlaced==false) then
-				table.insert(menu,{name=vTitle.Title, 0, callback=function() SelectTitle(vTitle.TitleID) end,tooltip=toolTip})
+				table.insert(menu,{name=vTitle.Title, rank = 0, callback=function() SelectTitle(vTitle.TitleID) end,tooltip=toolTip})
 			end
 		end
 		table.sort(menu, function(item1, item2) return ComboBoxSortHelper(item1, item2, dropdown) end)
 
 		local i = 1
 		for header, titles in spairs(subMenus) do
+			table.sort(titles.Entries, function(item1, item2) return ComboBoxSortHelper(item1, item2, dropdown, "rank",AVA_SORT_BY_RANK) end)
 			table.insert(menu, i, {name=header, entries=titles.Entries})
 			i = i + 1
 		end

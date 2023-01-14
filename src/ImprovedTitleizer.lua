@@ -332,7 +332,7 @@ local function InitializeTitles()
 end
 
 local function OnLoad(eventCode, name)
-	local debug = true
+	local debug = false
 	if name ~= Addon.Name then return end
 
 	InitializeTitles()

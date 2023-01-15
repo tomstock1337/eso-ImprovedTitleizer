@@ -15,3 +15,5 @@ Sample categories:
 - Savior
 - Master
 - Trials
+
+GitHub: https://github.com/tomstock1337/eso-ImprovedTitleizer

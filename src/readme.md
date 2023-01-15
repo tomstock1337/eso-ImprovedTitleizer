@@ -1,6 +1,6 @@
 # Improved Titleizer
 
-<center><img src="preview.png" alt="Screenshot" width=300px/></center>
+<center><img src="..\preview.png" alt="Screenshot" width=300px/></center>
 
 The purpose of this plugin is to categorize and alphabetize the Title list on the Character screen.
 
@@ -15,3 +15,5 @@ Sample categories:
 - Savior
 - Master
 - Trials
+
+GitHub: https://github.com/tomstock1337/eso-ImprovedTitleizer

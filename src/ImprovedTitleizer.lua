@@ -2,7 +2,7 @@ local Addon = {}
 Addon.Name = "ImprovedTitleizer"
 Addon.DisplayName = "ImprovedTitleizer"
 Addon.Author = "tomstock"
-Addon.Version = "1.0"
+Addon.Version = "1.1"
 
 local AVA_SORT_BY_RANK =
 {
@@ -389,9 +389,11 @@ local function OnLoad(eventCode, name)
 
 		local i = 1
 		for header, titles in spairs(subMenus) do
-			table.sort(titles.Entries, function(item1, item2) return ComboBoxSortHelper(item1, item2, dropdown, "rank",AVA_SORT_BY_RANK) end)
-			table.insert(menu, i, {name=header, entries=titles.Entries})
-			i = i + 1
+			if(table.getn(titles.Entries) > 0) then
+				table.sort(titles.Entries, function(item1, item2) return ComboBoxSortHelper(item1, item2, dropdown, "rank",AVA_SORT_BY_RANK) end)
+				table.insert(menu, i, {name=header, entries=titles.Entries})
+				i = i + 1
+			end
 		end
 		-- add divider below "No Title" if there is more
 		if #menu > 0 then

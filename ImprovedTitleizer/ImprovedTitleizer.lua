@@ -37,7 +37,7 @@ end
 local AchievmentIdsCategories =
 {
 	{
-		Name=GetString(SI_AVA_MENU_ALLIANCE_WAR_GROUP),
+		Name=GetString(SI_AVA_MENU_ALLIANCE_WAR_GROUP), --Alliance War
 		Entries=
 		{
 			{ID=92,Rank=1}, --Volunteer --Alliance War Volunteer
@@ -85,7 +85,7 @@ local AchievmentIdsCategories =
 		}
 	},
 	{
-		Name=GetString(SI_ACTIVITY_FINDER_CATEGORY_BATTLEGROUNDS),
+		Name=GetString(SI_ACTIVITY_FINDER_CATEGORY_BATTLEGROUNDS), --Battlegrounds
 		Entries=
 		{
 			{ID=1895}, --Bloodletter --Pit Hero
@@ -101,7 +101,7 @@ local AchievmentIdsCategories =
 		}
 	},
 	{
-		Name=GetString(SI_DUNGEON_FINDER_GENERAL_ACTIVITY_DESCRIPTOR),
+		Name=GetString(SI_DUNGEON_FINDER_GENERAL_ACTIVITY_DESCRIPTOR), --Dungeon
 		Entries=
 		{
 			{ID=1159}, --Deadlands Adept --Deadlands Savvy
@@ -155,7 +155,7 @@ local AchievmentIdsCategories =
 		}
 	},
 	{
-		Name=GetString(SI_QUESTTYPE12),
+		Name=GetString(SI_QUESTTYPE12), --Holiday Event
 		Entries={
 			{ID=1546}, --Sun's Dusk Reaper --An Unsparing Harvest
 			{ID=1677}, --Magnanimous --Glory of Magnus
@@ -168,7 +168,7 @@ local AchievmentIdsCategories =
 		}
 	},
 	{
-		Name=GetString(SI_QUESTTYPE17),
+		Name=GetString(SI_QUESTTYPE17), --Tales of Tribute
 		Entries={
 			{ID=3349,Rank=1}, --Roister's Club Initiate --Roister's Club Initiate
 			{ID=3350,Rank=2}, --Roister's Club Trainee --Roister's Club Trainee
@@ -186,7 +186,7 @@ local AchievmentIdsCategories =
 		}
 	},
 	{
-		Name=GetString(SI_GUILDACTIVITYATTRIBUTEVALUE6),
+		Name=GetString(SI_GUILDACTIVITYATTRIBUTEVALUE6), --Questing
 		Entries={
 			{ID=61}, --Covenant Hero --Hero of the Daggerfall Covenant
 			{ID=617}, --Pact Hero --Hero of the Ebonheart Pact
@@ -210,37 +210,6 @@ local AchievmentIdsCategories =
 			{ID=3219}, --The Wretched --Spire Sleuth
 			{ID=3501}, --Guardian of Galen --Savior of Galen
 			{ID=3556}, --Eye of the Queen --Buried Bequest
-		}
-	},
-	{
-		Name="Skyshard Hunter",
-		Entries={
-			{ID=2516}, --Craglorn Skyshard Hunter
-			{ID=2513}, --Dominion Skyshard Hunter
-			{ID=2514}, --Covenant Skyshard Hunter
-			{ID=2515}, --Pact Skyshard Hunter
-			{ID=2517}, --Cyrodiil Skyshard Hunter
-		}
-	},
-	{
-		Name=GetString(SI_BINDING_NAME_TOGGLE_SKILLS),
-		Entries={
-			{ID=702}, --Master Wizard --Arch-Mage
-			{ID=703}, --Fighters Guild Victor --Fighters Guild Veteran
-			{ID=2043}, --Undaunted --Truly Undaunted
-			{ID=2523}, --Scoundrel --Thieves Guild Skill Master
-			{ID=2524}, --Assassin --Dark Brotherhood Skill Master
-			{ID=2588}, --Locksmith --Legerdemain Skill Master
-			{ID=2589}, --Siegemaster --Alliance War Skill Master
-			{ID=2638}, --Soul Mage Maven --Soul Magic Skill Master
-			{ID=2786}, --Sagacious Seer --Master of the Eye
-			{ID=2792}, --Expert Excavator --Master of the Spade
-		}
-	},
-	{
-		Name="Savior",
-		Entries={
-			{ID=587}, --Savior of Nirn --Anchors Away
 			{ID=1868}, --Savior of Morrowind --Savior of Morrowind
 			{ID=2193}, --Savior of Summerset --Savior of Summerset
 			{ID=2509}, --Savior of Elsweyr --Savior of Elsweyr
@@ -251,17 +220,38 @@ local AchievmentIdsCategories =
 		}
 	},
 	{
-		Name="Master",
+		Name=GetString(SI_GAMEPAD_SKILLS_SKY_SHARDS), --Skyshards
 		Entries={
-			{ID=1383}, --Master Thief -- A Cutpurse Above ",
-			{ID=2620}, --Master Grappler -- Grappling Bow Pathfinder ",
-			{ID=2805}, --Master Historian -- Master Antiquarian ",
-			{ID=494}, --Master Angler -- Master Fisher ",
-			{ID=702}, --Master Wizard -- Arch-Mage ",
+			{ID=2516}, --Craglorn Skyshard Hunter
+			{ID=2513}, --Dominion Skyshard Hunter
+			{ID=2514}, --Covenant Skyshard Hunter
+			{ID=2515}, --Pact Skyshard Hunter
+			{ID=2517}, --Cyrodiil Skyshard Hunter
 		}
 	},
 	{
-		Name=GetString(SI_RAIDCATEGORY0),
+		Name=GetString(SI_BINDING_NAME_TOGGLE_SKILLS), --Skills
+		Entries={
+			{ID=494}, --Master Angler --Master Fisher
+			{ID=1383}, --Master Thief --A Cutpurse Above
+			{ID=2227}, --Grand Master Crafter --Grand Master Crafter
+			{ID=2230}, --Style Master --True Style Master
+			{ID=2805}, --Master Historian --Master Antiquarian
+			{ID=702}, --Master Wizard --Arch-Mage
+			{ID=703}, --Fighters Guild Victor --Fighters Guild Veteran
+			{ID=2043}, --Undaunted --Truly Undaunted
+			{ID=2523}, --Scoundrel --Thieves Guild Skill Master
+			{ID=2524}, --Assassin --Dark Brotherhood Skill Master
+			{ID=2588}, --Locksmith --Legerdemain Skill Master
+			{ID=2589}, --Siegemaster --Alliance War Skill Master
+			{ID=2638}, --Soul Mage Maven --Soul Magic Skill Master
+			{ID=2786}, --Sagacious Seer --Master of the Eye
+			{ID=2792}, --Expert Excavator --Master of the Spade
+			
+		}
+	},
+	{
+		Name=GetString(SI_RAIDCATEGORY0), --Trials
 		Entries={
 			{ID=1391}, --Dro-m'Athra Destroyer --Maw of Lorkhaj: Moons' Champion
 			{ID=1462}, --Ophidian Overlord --Sanctum Ophidia Conqueror

@@ -37,7 +37,7 @@ end
 local AchievmentIdsCategories =
 {
 	{
-		Name="Alliance War",
+		Name=GetString(SI_AVA_MENU_ALLIANCE_WAR_GROUP), --Alliance War
 		Entries=
 		{
 			{ID=92,Rank=1}, --Volunteer --Alliance War Volunteer
@@ -85,7 +85,7 @@ local AchievmentIdsCategories =
 		}
 	},
 	{
-		Name="Battlegrounds",
+		Name=GetString(SI_ACTIVITY_FINDER_CATEGORY_BATTLEGROUNDS), --Battlegrounds
 		Entries=
 		{
 			{ID=1895}, --Bloodletter --Pit Hero
@@ -101,7 +101,7 @@ local AchievmentIdsCategories =
 		}
 	},
 	{
-		Name="Dungeon",
+		Name=GetString(SI_DUNGEON_FINDER_GENERAL_ACTIVITY_DESCRIPTOR), --Dungeon
 		Entries=
 		{
 			{ID=1159}, --Deadlands Adept --Deadlands Savvy
@@ -155,7 +155,7 @@ local AchievmentIdsCategories =
 		}
 	},
 	{
-		Name="Holiday",
+		Name=GetString(SI_QUESTTYPE12), --Holiday Event
 		Entries={
 			{ID=1546}, --Sun's Dusk Reaper --An Unsparing Harvest
 			{ID=1677}, --Magnanimous --Glory of Magnus
@@ -168,7 +168,7 @@ local AchievmentIdsCategories =
 		}
 	},
 	{
-		Name="Tales of Tribute",
+		Name=GetString(SI_QUESTTYPE17), --Tales of Tribute
 		Entries={
 			{ID=3349,Rank=1}, --Roister's Club Initiate --Roister's Club Initiate
 			{ID=3350,Rank=2}, --Roister's Club Trainee --Roister's Club Trainee
@@ -178,22 +178,38 @@ local AchievmentIdsCategories =
 			{ID=3354,Rank=6}, --Roister's Club Expert --Roister's Club Expert
 			{ID=3355,Rank=7}, --Roister's Club Veteran --Roister's Club Veteran
 			{ID=3356,Rank=8}, --Roister's Club Master --Roister's Club Master
+			{ID=3342,Rank=9}, --Cardsharp --Ebony Roister
+			{ID=3340,Rank=10}, --Club Contender --Quicksilver Roister
+			{ID=3339,Rank=11}, --High-Stakes Gambler --Voidsteel Roister
+			{ID=3338,Rank=12}, --Game-Baron --Rubedite Roister
+			{ID=3325,Rank=13}, --Club Virtuoso --Tribute Tactician
 		}
 	},
 	{
-		Name="Skyshard Hunter",
+		Name=GetString(SI_GUILDACTIVITYATTRIBUTEVALUE6), --Questing
 		Entries={
-			{ID=2516}, --Craglorn Skyshard Hunter
-			{ID=2513}, --Dominion Skyshard Hunter
-			{ID=2514}, --Covenant Skyshard Hunter
-			{ID=2515}, --Pact Skyshard Hunter
-			{ID=2517}, --Cyrodiil Skyshard Hunter
-		}
-	},
-	{
-		Name="Savior",
-		Entries={
-			{ID=587}, --Savior of Nirn --Anchors Away
+			{ID=61}, --Covenant Hero --Hero of the Daggerfall Covenant
+			{ID=617}, --Pact Hero --Hero of the Ebonheart Pact
+			{ID=618}, --Dominion Hero --Hero of the Aldmeri Dominion
+			{ID=628}, --Tamriel Hero --Tamriel Expert Adventurer
+			{ID=1248}, --Hero of Wrothgar --Hero of Wrothgar
+			{ID=1260}, --Kingmaker --Kingmaker
+			{ID=2049}, --Hero of Clockwork City --Hero of Clockwork City
+			{ID=2210}, --Mystic --Psijic Sage
+			{ID=2325}, --Murkmire Prepper --Cyrodilic Collections Champion
+			{ID=2331}, --Hero of Murkmire --Hero of Murkmire
+			{ID=2604}, --Guardian of Elsweyr --Bright Moons Over Elsweyr
+			{ID=2623}, --Hero of the Dragonguard --Hero of the Dragonguard
+			{ID=2935}, --Champion of Markarth --Protector of Markarth
+			{ID=2939}, --Hero of Skyrim --A Bridge Between Kingdoms
+			{ID=2941}, --Guardian of the Reach --Savior of the Reach
+			{ID=3145}, --Hero of Fargrave --Hero of Fargrave
+			{ID=3214}, --Cataclyst Breaker --Hopeful Rescuer
+			{ID=3217}, --Champion of the Deadlands --Eternal Optimist
+			{ID=3218}, --Hope's Hero --Friend to the Kalmur
+			{ID=3219}, --The Wretched --Spire Sleuth
+			{ID=3501}, --Guardian of Galen --Savior of Galen
+			{ID=3556}, --Eye of the Queen --Buried Bequest
 			{ID=1868}, --Savior of Morrowind --Savior of Morrowind
 			{ID=2193}, --Savior of Summerset --Savior of Summerset
 			{ID=2509}, --Savior of Elsweyr --Savior of Elsweyr
@@ -204,17 +220,38 @@ local AchievmentIdsCategories =
 		}
 	},
 	{
-		Name="Master",
+		Name=GetString(SI_GAMEPAD_SKILLS_SKY_SHARDS), --Skyshards
 		Entries={
-			{ID=1383}, --Master Thief -- A Cutpurse Above ",
-			{ID=2620}, --Master Grappler -- Grappling Bow Pathfinder ",
-			{ID=2805}, --Master Historian -- Master Antiquarian ",
-			{ID=494}, --Master Angler -- Master Fisher ",
-			{ID=702}, --Master Wizard -- Arch-Mage ",
+			{ID=2516}, --Craglorn Skyshard Hunter
+			{ID=2513}, --Dominion Skyshard Hunter
+			{ID=2514}, --Covenant Skyshard Hunter
+			{ID=2515}, --Pact Skyshard Hunter
+			{ID=2517}, --Cyrodiil Skyshard Hunter
 		}
 	},
 	{
-		Name="Trials",
+		Name=GetString(SI_BINDING_NAME_TOGGLE_SKILLS), --Skills
+		Entries={
+			{ID=494}, --Master Angler --Master Fisher
+			{ID=1383}, --Master Thief --A Cutpurse Above
+			{ID=2227}, --Grand Master Crafter --Grand Master Crafter
+			{ID=2230}, --Style Master --True Style Master
+			{ID=2805}, --Master Historian --Master Antiquarian
+			{ID=702}, --Master Wizard --Arch-Mage
+			{ID=703}, --Fighters Guild Victor --Fighters Guild Veteran
+			{ID=2043}, --Undaunted --Truly Undaunted
+			{ID=2523}, --Scoundrel --Thieves Guild Skill Master
+			{ID=2524}, --Assassin --Dark Brotherhood Skill Master
+			{ID=2588}, --Locksmith --Legerdemain Skill Master
+			{ID=2589}, --Siegemaster --Alliance War Skill Master
+			{ID=2638}, --Soul Mage Maven --Soul Magic Skill Master
+			{ID=2786}, --Sagacious Seer --Master of the Eye
+			{ID=2792}, --Expert Excavator --Master of the Spade
+			
+		}
+	},
+	{
+		Name=GetString(SI_RAIDCATEGORY0), --Trials
 		Entries={
 			{ID=1391}, --Dro-m'Athra Destroyer --Maw of Lorkhaj: Moons' Champion
 			{ID=1462}, --Ophidian Overlord --Sanctum Ophidia Conqueror
@@ -323,7 +360,7 @@ local function InitializeTitles()
 		end
 	end
 	for i,sub in pairs(AchievmentIdsCategories) do
-		if (sub.Name=="Alliance War") then
+		if (sub.Name==GetString(SI_AVA_MENU_ALLIANCE_WAR_GROUP)) then
 			for j,rank in pairs(sub.Entries) do
 				rank.Icon="|t28:28:"..GetAvARankIcon(j*2).."|t "
 			end
@@ -337,7 +374,7 @@ local function OnLoad(eventCode, name)
 
 	InitializeTitles()
 
-	local LSM = LibStub("LibScrollableMenu")
+	local LSM = LibScrollableMenu
 
 	local orgAddDropdownRow = STATS.AddDropdownRow
 	STATS.AddDropdownRow = function(self, rowName)

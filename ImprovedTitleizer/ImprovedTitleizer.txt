@@ -8,8 +8,6 @@
 ## Version: 1.1
 ## Author: tomstock
 ## APIVersion: 100026
-## DependsOn: LibStub LibCustomMenu LibDebugLogger>=180
-
-libs/LibScrollableMenu/LibScrollableMenu.lua
+## DependsOn: LibCustomMenu LibDebugLogger>=180 LibScrollableMenu
 
 ImprovedTitleizer.lua

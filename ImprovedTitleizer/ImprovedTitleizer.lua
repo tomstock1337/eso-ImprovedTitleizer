@@ -1,8 +1,8 @@
-local Addon = {}
-Addon.Name = "ImprovedTitleizer"
-Addon.DisplayName = "ImprovedTitleizer"
-Addon.Author = "tomstock"
-Addon.Version = "1.1"
+local ImprovedTitleizer = {}
+ImprovedTitleizer.Name = "ImprovedTitleizer"
+ImprovedTitleizer.DisplayName = "ImprovedTitleizer"
+ImprovedTitleizer.Author = "tomstock"
+ImprovedTitleizer.Version = "1.3"
 
 local AVA_SORT_BY_RANK =
 {
@@ -370,7 +370,7 @@ end
 
 local function OnLoad(eventCode, name)
 	local debug = false
-	if name ~= Addon.Name then return end
+	if name ~= ImprovedTitleizer.Name then return end
 
 	InitializeTitles()
 
@@ -462,11 +462,11 @@ local function OnLoad(eventCode, name)
 		STATS.UpdateTitleDropdownSelection = UpdateTitleDropdownSelection
 	end
 
-	EVENT_MANAGER:UnregisterForEvent(Addon.Name, EVENT_ADD_ON_LOADED)
+	EVENT_MANAGER:UnregisterForEvent(ImprovedTitleizer.Name, EVENT_ADD_ON_LOADED)
 end
-EVENT_MANAGER:RegisterForEvent(Addon.Name, EVENT_ADD_ON_LOADED, OnLoad)
+EVENT_MANAGER:RegisterForEvent(ImprovedTitleizer.Name, EVENT_ADD_ON_LOADED, OnLoad)
 
-IMPROVEDTITLEIZER = Addon
+IMPROVEDTITLEIZER = ImprovedTitleizer
 
 SLASH_COMMANDS["/dumptitles"] = function()
 	--{TitleID=id, CategoryID=categoryId, CategoryName=categoryName,SubCategoryID=subCategory,SubCategoryName=subCategoryName,HasTitle=hasTitle}

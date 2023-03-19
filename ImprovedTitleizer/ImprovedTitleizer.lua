@@ -380,22 +380,7 @@ local function InitializeTitles()
 	ImprovedTitleizer.savedVariables.titleDetails = AllTitles
 end
 
-local function OnLoad(eventCode, name)
-
-	if name ~= ImprovedTitleizer.Name then return end
-
-	ImprovedTitleizer.savedVariables = ZO_SavedVars:NewAccountWide("ImprovedTitleizerSavedVariables", 1, nil, {}) --Instead of nil you can also use GetWorldName() to save the SV server dependent
-	if ImprovedTitleizer.savedVariables.numTitles == nil or ImprovedTitleizer.savedVariables.titleDetails == nil then
-		InitializeTitles()
-		if logger ~= nil then logger:Info("New or corrupt saved variables, recreating.") end
-	elseif ImprovedTitleizer.savedVariables.numTitles ~= GetNumTitles() then
-		InitializeTitles()
-		if logger ~= nil then logger:Info("New titles exist, recreating.") end
-	else
-		AllTitles=ImprovedTitleizer.savedVariables.titleDetails
-		if logger ~= nil then logger:Info("Loading titles from saved variables.") end
-	end
-
+local function AdjustTitleMenu()
 	local LSM = LibScrollableMenu
 
 	local orgAddDropdownRow = STATS.AddDropdownRow
@@ -482,9 +467,38 @@ local function OnLoad(eventCode, name)
 		STATS.UpdateTitleDropdownTitles = UpdateTitleDropdownTitles
 		STATS.UpdateTitleDropdownSelection = UpdateTitleDropdownSelection
 	end
+end
+
+local function OnLoad(eventCode, name)
+
+	if name ~= ImprovedTitleizer.Name then return end
+
+	ImprovedTitleizer.savedVariables = ZO_SavedVars:NewAccountWide("ImprovedTitleizerSavedVariables", 1, nil, {}) --Instead of nil you can also use GetWorldName() to save the SV server dependent
+	if ImprovedTitleizer.savedVariables.numTitles == nil or ImprovedTitleizer.savedVariables.titleDetails == nil then
+		InitializeTitles()
+		if logger ~= nil then logger:Info("New or corrupt saved variables, recreating.") end
+	elseif ImprovedTitleizer.savedVariables.numTitles ~= GetNumTitles() then
+		InitializeTitles()
+		if logger ~= nil then logger:Info("New titles exist, recreating.") end
+	else
+		AllTitles=ImprovedTitleizer.savedVariables.titleDetails
+		if logger ~= nil then logger:Info("Loading titles from saved variables.") end
+	end
+
+	AdjustTitleMenu()
 
 	EVENT_MANAGER:UnregisterForEvent(ImprovedTitleizer.Name, EVENT_ADD_ON_LOADED)
 end
+
+local function OnAchievementsAwarded(eventCode, name)
+	if logger ~= nil then logger:Info("New achievement awarded.") end
+	InitializeTitles()
+	AdjustTitleMenu()
+end
+
 EVENT_MANAGER:RegisterForEvent(ImprovedTitleizer.Name, EVENT_ADD_ON_LOADED, OnLoad)
+EVENT_MANAGER:RegisterForEvent(ImprovedTitleizer.Name, EVENT_ACHIEVEMENT_AWARDED, OnAchievementsAwarded)
+
+
 
 IMPROVEDTITLEIZER = ImprovedTitleizer

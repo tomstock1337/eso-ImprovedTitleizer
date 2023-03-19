@@ -1,8 +1,14 @@
-local Addon = {}
-Addon.Name = "ImprovedTitleizer"
-Addon.DisplayName = "ImprovedTitleizer"
-Addon.Author = "tomstock"
-Addon.Version = "1.1"
+local ImprovedTitleizer = {}
+ImprovedTitleizer.Name = "ImprovedTitleizer"
+ImprovedTitleizer.DisplayName = "ImprovedTitleizer"
+ImprovedTitleizer.Author = "tomstock"
+ImprovedTitleizer.Version = "1.3"
+ImprovedTitleizer.Debug = false
+
+if LibDebugLogger then
+	logger = LibDebugLogger.Create(ImprovedTitleizer.Name)
+	logger:Info("Loaded logger")
+end
 
 local AVA_SORT_BY_RANK =
 {
@@ -152,6 +158,12 @@ local AchievmentIdsCategories =
 			{ID=3400}, --Fist of Tava --Fist of Tava
 			{ID=3525}, --Earthen Root Champion --Earthen Root Enclave Champion
 			{ID=3526}, --Graven Deep Champion --Graven Deep Champion
+			{ID=3618}, --Scrivener's Hall Champion --Scribe Savior
+			{ID=3535}, --Magnastylus in the Making --Curator's Champion
+			{ID=3531}, --Inflammable --Weaver's Bane
+			{ID=3617}, --Bal Sunnar Champion --Shadow Blessed
+			{ID=3474}, --Temporal Tempes --Temporal Tempest
+			{ID=3470}, --Telvanni Tormentor --Scourge of Sunnar
 		}
 	},
 	{
@@ -247,7 +259,6 @@ local AchievmentIdsCategories =
 			{ID=2638}, --Soul Mage Maven --Soul Magic Skill Master
 			{ID=2786}, --Sagacious Seer --Master of the Eye
 			{ID=2792}, --Expert Excavator --Master of the Spade
-			
 		}
 	},
 	{
@@ -321,7 +332,6 @@ local GetTitle                           = GetTitle -- I want original titles
 --Usage: local strTitle GetTitle(achievementId)
 
 local function InitializeTitles()
-	--local logger = LibDebugLogger("ImprovedTitleizer")
 
 	local function CheckAchievementsInLine(id, categoryId, categoryName, subCategory, subCategoryName)
 		--Go through every achievement looking for if a title exists for it.
@@ -366,14 +376,11 @@ local function InitializeTitles()
 			end
 		end
 	end
+	ImprovedTitleizer.savedVariables.numTitles = GetNumTitles()
+	ImprovedTitleizer.savedVariables.titleDetails = AllTitles
 end
 
-local function OnLoad(eventCode, name)
-	local debug = false
-	if name ~= Addon.Name then return end
-
-	InitializeTitles()
-
+local function AdjustTitleMenu()
 	local LSM = LibScrollableMenu
 
 	local orgAddDropdownRow = STATS.AddDropdownRow
@@ -393,7 +400,6 @@ local function OnLoad(eventCode, name)
 	end
 
 	local function UpdateTitleDropdownTitles(self, dropdown)
-		local debug = false
 		dropdown:ClearItems()
 		dropdown:AddItem(ZO_ComboBox:CreateItemEntry(GetString(SI_STATS_NO_TITLE), function() SelectTitle(nil) end), ZO_COMBOBOX_SUPRESS_UPDATE)
 
@@ -461,25 +467,38 @@ local function OnLoad(eventCode, name)
 		STATS.UpdateTitleDropdownTitles = UpdateTitleDropdownTitles
 		STATS.UpdateTitleDropdownSelection = UpdateTitleDropdownSelection
 	end
-
-	EVENT_MANAGER:UnregisterForEvent(Addon.Name, EVENT_ADD_ON_LOADED)
 end
-EVENT_MANAGER:RegisterForEvent(Addon.Name, EVENT_ADD_ON_LOADED, OnLoad)
 
-IMPROVEDTITLEIZER = Addon
+local function OnLoad(eventCode, name)
 
-SLASH_COMMANDS["/dumptitles"] = function()
-	--{TitleID=id, CategoryID=categoryId, CategoryName=categoryName,SubCategoryID=subCategory,SubCategoryName=subCategoryName,HasTitle=hasTitle}
-	for i,vTitle in pairs(AllTitles) do
-		local output = ""
-		output = output..vTitle.TitleID.." "
-		output = output.."HasTitle: "..tostring(vTitle.HasTitle).." "
-		output = output.."Title: "..vTitle.Title.." "
-		output = output.."CategoryID: "..vTitle.CategoryID.." "
-		output = output.."CategoryName: "..vTitle.CategoryName.." "
-		output = output.."AchievementID: "..vTitle.AchievementID.." "
-		output = output.."AchievementName: "..vTitle.AchievementName.." "
-		output = output.."AchievementDescription: "..vTitle.AchievementDescription.." "
-		d(output)
+	if name ~= ImprovedTitleizer.Name then return end
+
+	ImprovedTitleizer.savedVariables = ZO_SavedVars:NewAccountWide("ImprovedTitleizerSavedVariables", 1, nil, {}) --Instead of nil you can also use GetWorldName() to save the SV server dependent
+	if ImprovedTitleizer.savedVariables.numTitles == nil or ImprovedTitleizer.savedVariables.titleDetails == nil then
+		InitializeTitles()
+		if logger ~= nil then logger:Info("New or corrupt saved variables, recreating.") end
+	elseif ImprovedTitleizer.savedVariables.numTitles ~= GetNumTitles() then
+		InitializeTitles()
+		if logger ~= nil then logger:Info("New titles exist, recreating.") end
+	else
+		AllTitles=ImprovedTitleizer.savedVariables.titleDetails
+		if logger ~= nil then logger:Info("Loading titles from saved variables.") end
 	end
+
+	AdjustTitleMenu()
+
+	EVENT_MANAGER:UnregisterForEvent(ImprovedTitleizer.Name, EVENT_ADD_ON_LOADED)
 end
+
+local function OnAchievementsAwarded(eventCode, name)
+	if logger ~= nil then logger:Info("New achievement awarded.") end
+	InitializeTitles()
+	AdjustTitleMenu()
+end
+
+EVENT_MANAGER:RegisterForEvent(ImprovedTitleizer.Name, EVENT_ADD_ON_LOADED, OnLoad)
+EVENT_MANAGER:RegisterForEvent(ImprovedTitleizer.Name, EVENT_ACHIEVEMENT_AWARDED, OnAchievementsAwarded)
+
+
+
+IMPROVEDTITLEIZER = ImprovedTitleizer

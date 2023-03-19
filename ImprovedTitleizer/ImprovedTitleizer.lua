@@ -158,6 +158,12 @@ local AchievmentIdsCategories =
 			{ID=3400}, --Fist of Tava --Fist of Tava
 			{ID=3525}, --Earthen Root Champion --Earthen Root Enclave Champion
 			{ID=3526}, --Graven Deep Champion --Graven Deep Champion
+			{ID=3618}, --Scrivener's Hall Champion --Scribe Savior
+			{ID=3535}, --Magnastylus in the Making --Curator's Champion
+			{ID=3531}, --Inflammable --Weaver's Bane
+			{ID=3617}, --Bal Sunnar Champion --Shadow Blessed
+			{ID=3474}, --Temporal Tempes --Temporal Tempest
+			{ID=3470}, --Telvanni Tormentor --Scourge of Sunnar
 		}
 	},
 	{

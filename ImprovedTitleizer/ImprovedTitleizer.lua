@@ -2,10 +2,10 @@ local ImprovedTitleizer = {}
 ImprovedTitleizer.Name = "ImprovedTitleizer"
 ImprovedTitleizer.DisplayName = "ImprovedTitleizer"
 ImprovedTitleizer.Author = "tomstock"
-ImprovedTitleizer.Version = "1.3"
+ImprovedTitleizer.Version = "1.3.1"
 ImprovedTitleizer.Debug = false
 
-if LibDebugLogger then
+if LibDebugLogger and ImprovedTitleizer.Debug then
 	logger = LibDebugLogger.Create(ImprovedTitleizer.Name)
 	logger:Info("Loaded logger")
 end
@@ -307,7 +307,7 @@ local AchievmentIdsCategories =
 	}
 }
 
-local AllTitles={};
+local AllTitles={}
 --{TitleID=id, CategoryID=categoryId, CategoryName=categoryName,SubCategoryID=subCategory,SubCategoryName=subCategoryName,HasTitle=hasTitle}
 
 local GetNumAchievementCategories        = GetNumAchievementCategories
@@ -332,6 +332,8 @@ local GetTitle                           = GetTitle -- I want original titles
 --Usage: local strTitle GetTitle(achievementId)
 
 local function InitializeTitles()
+
+	AllTitles = {}
 
 	local function CheckAchievementsInLine(id, categoryId, categoryName, subCategory, subCategoryName)
 		--Go through every achievement looking for if a title exists for it.
@@ -474,15 +476,20 @@ local function OnLoad(eventCode, name)
 	if name ~= ImprovedTitleizer.Name then return end
 
 	ImprovedTitleizer.savedVariables = ZO_SavedVars:NewAccountWide("ImprovedTitleizerSavedVariables", 1, nil, {}) --Instead of nil you can also use GetWorldName() to save the SV server dependent
-	if ImprovedTitleizer.savedVariables.numTitles == nil or ImprovedTitleizer.savedVariables.titleDetails == nil then
+
+	if ImprovedTitleizer.savedVariables.lastversion == nil or ImprovedTitleizer.savedVariables.lastversion ~= ImprovedTitleizer.Version then
+		if logger ~= nil then logger:Info("New version of addon installed, recreating.") end
+		ImprovedTitleizer.savedVariables.lastversion = ImprovedTitleizer.Version
 		InitializeTitles()
+	elseif ImprovedTitleizer.savedVariables.numTitles == nil or ImprovedTitleizer.savedVariables.titleDetails == nil then
 		if logger ~= nil then logger:Info("New or corrupt saved variables, recreating.") end
-	elseif ImprovedTitleizer.savedVariables.numTitles ~= GetNumTitles() then
 		InitializeTitles()
+	elseif ImprovedTitleizer.savedVariables.numTitles ~= GetNumTitles() then
 		if logger ~= nil then logger:Info("New titles exist, recreating.") end
+		InitializeTitles()
 	else
-		AllTitles=ImprovedTitleizer.savedVariables.titleDetails
 		if logger ~= nil then logger:Info("Loading titles from saved variables.") end
+		AllTitles=ImprovedTitleizer.savedVariables.titleDetails
 	end
 
 	AdjustTitleMenu()
@@ -499,6 +506,9 @@ end
 EVENT_MANAGER:RegisterForEvent(ImprovedTitleizer.Name, EVENT_ADD_ON_LOADED, OnLoad)
 EVENT_MANAGER:RegisterForEvent(ImprovedTitleizer.Name, EVENT_ACHIEVEMENT_AWARDED, OnAchievementsAwarded)
 
-
-
 IMPROVEDTITLEIZER = ImprovedTitleizer
+
+SLASH_COMMANDS["/refreshtitles"] = function()
+	InitializeTitles()
+	AdjustTitleMenu()
+end

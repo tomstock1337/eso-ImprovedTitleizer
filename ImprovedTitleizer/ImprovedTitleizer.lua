@@ -2,7 +2,7 @@ local ImprovedTitleizer = {}
 ImprovedTitleizer.Name = "ImprovedTitleizer"
 ImprovedTitleizer.DisplayName = "ImprovedTitleizer"
 ImprovedTitleizer.Author = "tomstock"
-ImprovedTitleizer.Version = "1.3.1"
+ImprovedTitleizer.Version = "1.3.2"
 ImprovedTitleizer.Debug = false
 
 if LibDebugLogger and ImprovedTitleizer.Debug then
@@ -479,7 +479,9 @@ local function OnLoad(eventCode, name)
 
 	if ImprovedTitleizer.savedVariables.lastversion == nil or ImprovedTitleizer.savedVariables.lastversion ~= ImprovedTitleizer.Version then
 		if logger ~= nil then logger:Info("New version of addon installed, recreating.") end
-		ImprovedTitleizer.savedVariables.lastversion = ImprovedTitleizer.Version
+		InitializeTitles()
+	elseif ImprovedTitleizer.savedVariables.lastESOversion == nil or ImprovedTitleizer.savedVariables.lastversion ~= GetESOVersionString() then
+		if logger ~= nil then logger:Info("New version of ESO installed, recreating.") end
 		InitializeTitles()
 	elseif ImprovedTitleizer.savedVariables.numTitles == nil or ImprovedTitleizer.savedVariables.titleDetails == nil then
 		if logger ~= nil then logger:Info("New or corrupt saved variables, recreating.") end
@@ -491,6 +493,8 @@ local function OnLoad(eventCode, name)
 		if logger ~= nil then logger:Info("Loading titles from saved variables.") end
 		AllTitles=ImprovedTitleizer.savedVariables.titleDetails
 	end
+	ImprovedTitleizer.savedVariables.lastversion = ImprovedTitleizer.Version
+	ImprovedTitleizer.savedVariables.lastESOversion = GetESOVersionString()
 
 	AdjustTitleMenu()
 

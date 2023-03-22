@@ -74,6 +74,16 @@ local AchievmentIdsCategories =
 		},
 	},
 	{
+		Name="Housing", --Alliance WarHousing
+		Entries=
+		{
+			{ID=1727}, --Clan Father --Clan <<player{Father/Mother}>>
+			{ID=1728}, --Lord --<<player{Lord/Lady}>>
+			{ID=1729}, --Councilor --Councilor
+			{ID=1730}, --Count --<<player{Count/Countess}>>
+		},
+	},
+	{
 		Name="Arena",
 		Entries=
 		{
@@ -103,7 +113,12 @@ local AchievmentIdsCategories =
 			{ID=1919}, --Relic Runner --Triple Threat
 			{ID=1954}, --Chaos Guardian --Chaos Guardian
 			{ID=1955}, --Chaos Champion --Chaos Champion
-
+			{ID=1907}, --Standard-Guardian --Grand Standard-Guardian
+			{ID=1915}, --Battleground Butcher --Battleground Butcher
+			{ID=1916}, --Tactician --Tactician
+			{ID=1918}, --Paragon --Paragon
+			{ID=1921}, --The Merciless --Quadruple Kill
+			{ID=1956}, --Chaos Keeper --Walk It Off
 		}
 	},
 	{
@@ -164,6 +179,8 @@ local AchievmentIdsCategories =
 			{ID=3617}, --Bal Sunnar Champion --Shadow Blessed
 			{ID=3474}, --Temporal Tempes --Temporal Tempest
 			{ID=3470}, --Telvanni Tormentor --Scourge of Sunnar
+			{ID=2417}, --Hollowfang Exsanguinator --Drunk on Power
+
 		}
 	},
 	{

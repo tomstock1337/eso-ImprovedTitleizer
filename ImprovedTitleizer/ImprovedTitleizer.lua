@@ -351,6 +351,8 @@ local AchievmentIdsCategories =
 local AllTitles={}
 --{TitleID=id, CategoryID=categoryId, CategoryName=categoryName,SubCategoryID=subCategory,SubCategoryName=subCategoryName,HasTitle=hasTitle}
 
+local TitleMenu = {}
+
 local GetNumAchievementCategories        = GetNumAchievementCategories
 --Usage: local numAchieveCategory = GetNumAchievementCategories()
 local GetAchievementCategoryInfo         = GetAchievementCategoryInfo
@@ -435,10 +437,67 @@ local function InitializeTitles()
 end
 --[[
 	==============================================
+	Contstruct the Title Menu array
+	==============================================
+--]]
+local function ConstructTitleMenu()
+	local LSM = LibScrollableMenu
+
+	local function SortHelper(item1, item2, sortKey, sortType, sortOrder)
+		return ZO_TableOrderingFunction(item1, item2, sortKey or "name", sortType or ZO_SORT_BY_NAME, sortOrder or ZO_SORT_ORDER_UP)
+	end
+
+	TitleMenu = {}
+	local subMenus={}
+	for i,sub in pairs(AchievmentIdsCategories) do
+		subMenus[sub.Name]={Entries={}}
+	end
+	for i,vTitle in pairs(AllTitles) do
+		if(vTitle.HasTitle) then
+			local titlePlaced = false
+			local toolTip = vTitle.AchievementName.."\n"..vTitle.CategoryName
+			if debug==true then
+				toolTip = toolTip.."\n"..vTitle.TitleID
+			end
+			for k, vCategory in pairs(AchievmentIdsCategories) do
+				for j,q in pairs(vCategory.Entries) do
+					if vTitle.AchievementID==q.ID then
+						table.insert(subMenus[vCategory.Name].Entries,{name=(q.Icon or "")..vTitle.Title, rank=q.Rank or 0, callback=function() SelectTitle(vTitle.TitleID) end,tooltip=toolTip})
+						titlePlaced=true
+					end
+				end
+			end
+			if(titlePlaced==false) then
+				table.insert(TitleMenu,{name=vTitle.Title, rank = 0, callback=function() SelectTitle(vTitle.TitleID) end,tooltip=toolTip})
+			end
+		end
+	end
+	table.sort(TitleMenu, function(item1, item2) return SortHelper(item1, item2) end)
+
+	local i = 1
+	for header, titles in spairs(subMenus) do
+		if(table.getn(titles.Entries) > 0) then
+			table.sort(titles.Entries, function(item1, item2) return SortHelper(item1, item2, "rank",AVA_SORT_BY_RANK) end)
+			table.insert(TitleMenu, i, {name=header, entries=titles.Entries})
+			i = i + 1
+		end
+	end
+	-- add divider below "No Title" if there is more
+	if #TitleMenu > 0 then
+		table.insert(TitleMenu, 1, {name=LSM.DIVIDER})
+		i = i + 1
+	end
+	-- add divider below last submenu if there is more
+	if i <= #TitleMenu then
+		table.insert(TitleMenu, i, {name=LSM.DIVIDER})
+	end
+end
+--[[
+	==============================================
 	Adjust the UI
 	==============================================
 --]]
-local function AdjustTitleMenu()
+local function SetupTitleEventManagement()
 	local LSM = LibScrollableMenu
 
 	local orgAddDropdownRow = STATS.AddDropdownRow
@@ -453,59 +512,13 @@ local function AdjustTitleMenu()
 		return control
 	end
 
-	local function ComboBoxSortHelper(item1, item2, comboBoxObject, sortKey, sortType, sortOrder)
-		return ZO_TableOrderingFunction(item1, item2, sortKey or "name", sortType or comboBoxObject.m_sortType, sortOrder or comboBoxObject.m_sortOrder)
-	end
-
 	local function UpdateTitleDropdownTitles(self, dropdown)
 		dropdown:ClearItems()
 		dropdown:AddItem(ZO_ComboBox:CreateItemEntry(GetString(SI_STATS_NO_TITLE), function() SelectTitle(nil) end), ZO_COMBOBOX_SUPRESS_UPDATE)
 
-		local menu = {}
-		local subMenus={}
-		for i,sub in pairs(AchievmentIdsCategories) do
-			subMenus[sub.Name]={Entries={}}
-		end
-		for i,vTitle in pairs(AllTitles) do
-			if(vTitle.HasTitle) then
-				local titlePlaced = false
-				local toolTip = vTitle.AchievementName.."\n"..vTitle.CategoryName
-				if debug==true then
-					toolTip = toolTip.."\n"..vTitle.TitleID
-				end
-				for k, vCategory in pairs(AchievmentIdsCategories) do
-					for j,q in pairs(vCategory.Entries) do
-						if vTitle.AchievementID==q.ID then
-							table.insert(subMenus[vCategory.Name].Entries,{name=(q.Icon or "")..vTitle.Title, rank=q.Rank or 0, callback=function() SelectTitle(vTitle.TitleID) end,tooltip=toolTip})
-							titlePlaced=true
-						end
-					end
-				end
-				if(titlePlaced==false) then
-					table.insert(menu,{name=vTitle.Title, rank = 0, callback=function() SelectTitle(vTitle.TitleID) end,tooltip=toolTip})
-				end
-			end
-		end
-		table.sort(menu, function(item1, item2) return ComboBoxSortHelper(item1, item2, dropdown) end)
+		ConstructTitleMenu()
 
-		local i = 1
-		for header, titles in spairs(subMenus) do
-			if(table.getn(titles.Entries) > 0) then
-				table.sort(titles.Entries, function(item1, item2) return ComboBoxSortHelper(item1, item2, dropdown, "rank",AVA_SORT_BY_RANK) end)
-				table.insert(menu, i, {name=header, entries=titles.Entries})
-				i = i + 1
-			end
-		end
-		-- add divider below "No Title" if there is more
-		if #menu > 0 then
-			table.insert(menu, 1, {name=LSM.DIVIDER})
-			i = i + 1
-		end
-		-- add divider below last submenu if there is more
-		if i <= #menu then
-			table.insert(menu, i, {name=LSM.DIVIDER})
-		end
-		dropdown:AddItems(menu)
+		dropdown:AddItems(TitleMenu)
 
 		self:UpdateTitleDropdownSelection(dropdown)
 	end
@@ -556,7 +569,7 @@ local function OnLoad(eventCode, name)
 	ImprovedTitleizer.savedVariables.lastversion = ImprovedTitleizer.Version
 	ImprovedTitleizer.savedVariables.lastESOversion = GetESOVersionString()
 
-	AdjustTitleMenu()
+	SetupTitleEventManagement()
 
 	EVENT_MANAGER:UnregisterForEvent(ImprovedTitleizer.Name, EVENT_ADD_ON_LOADED)
 end
@@ -568,7 +581,7 @@ end
 local function OnAchievementsAwarded(eventCode, name)
 	if logger ~= nil then logger:Info("New achievement awarded.") end
 	InitializeTitles()
-	AdjustTitleMenu()
+	SetupTitleEventManagement()
 end
 
 EVENT_MANAGER:RegisterForEvent(ImprovedTitleizer.Name, EVENT_ADD_ON_LOADED, OnLoad)
@@ -582,5 +595,5 @@ IMPROVEDTITLEIZER = ImprovedTitleizer
 --]]
 SLASH_COMMANDS["/refreshtitles"] = function()
 	InitializeTitles()
-	AdjustTitleMenu()
+	SetupTitleEventManagement()
 end

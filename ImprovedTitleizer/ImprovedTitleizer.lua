@@ -1,10 +1,19 @@
+--[[
+	==============================================
+	Addon header information
+	==============================================
+--]]
 local ImprovedTitleizer = {}
 ImprovedTitleizer.Name = "ImprovedTitleizer"
 ImprovedTitleizer.DisplayName = "ImprovedTitleizer"
 ImprovedTitleizer.Author = "tomstock"
 ImprovedTitleizer.Version = "1.3.2"
 ImprovedTitleizer.Debug = false
-
+--[[
+	==============================================
+	Setup LibDebugLogger as an optional dependency
+	==============================================
+--]]
 if LibDebugLogger and ImprovedTitleizer.Debug then
 	logger = LibDebugLogger.Create(ImprovedTitleizer.Name)
 	logger:Info("Loaded logger")
@@ -15,7 +24,12 @@ local AVA_SORT_BY_RANK =
     ["name"] = {},
     ["rank"] = {tiebreaker = "name", isNumeric = true},
 }
-
+--[[
+	==============================================
+	Utility Functions
+		spairs - For sorting keys in an array
+	==============================================
+--]]
 local function spairs(t, order)
     -- collect the keys
     local keys = {}
@@ -39,7 +53,13 @@ local function spairs(t, order)
     end
 end
 
---These are actually their respective achievementIds
+--[[
+	==============================================
+	Manual Categorization
+	  --ID = Achievement ID
+		--Rank = Sort override
+	==============================================
+--]]
 local AchievmentIdsCategories =
 {
 	{
@@ -74,7 +94,7 @@ local AchievmentIdsCategories =
 		},
 	},
 	{
-		Name="Housing", --Alliance WarHousing
+		Name="Housing", --Housing
 		Entries=
 		{
 			{ID=1727}, --Clan Father --Clan <<player{Father/Mother}>>
@@ -180,7 +200,6 @@ local AchievmentIdsCategories =
 			{ID=3474}, --Temporal Tempes --Temporal Tempest
 			{ID=3470}, --Telvanni Tormentor --Scourge of Sunnar
 			{ID=2417}, --Hollowfang Exsanguinator --Drunk on Power
-
 		}
 	},
 	{
@@ -324,6 +343,11 @@ local AchievmentIdsCategories =
 	}
 }
 
+--[[
+	==============================================
+	Used function documentation
+	==============================================
+--]]
 local AllTitles={}
 --{TitleID=id, CategoryID=categoryId, CategoryName=categoryName,SubCategoryID=subCategory,SubCategoryName=subCategoryName,HasTitle=hasTitle}
 
@@ -348,10 +372,21 @@ local GetAchievementInfo                 = GetAchievementInfo
 local GetTitle                           = GetTitle -- I want original titles
 --Usage: local strTitle GetTitle(achievementId)
 
+--[[
+	==============================================
+	[Re-]Creates the title array for use in the addon
+
+	Goes through each achievement to get title details
+	==============================================
+--]]
 local function InitializeTitles()
 
 	AllTitles = {}
-
+	--[[
+		==============================================
+		Gets title details for the specified achievement and adds to the array
+		==============================================
+	--]]
 	local function CheckAchievementsInLine(id, categoryId, categoryName, subCategory, subCategoryName)
 		--Go through every achievement looking for if a title exists for it.
 		local firstId = GetFirstAchievementInLine(id)
@@ -398,7 +433,11 @@ local function InitializeTitles()
 	ImprovedTitleizer.savedVariables.numTitles = GetNumTitles()
 	ImprovedTitleizer.savedVariables.titleDetails = AllTitles
 end
-
+--[[
+	==============================================
+	Adjust the UI
+	==============================================
+--]]
 local function AdjustTitleMenu()
 	local LSM = LibScrollableMenu
 
@@ -487,7 +526,11 @@ local function AdjustTitleMenu()
 		STATS.UpdateTitleDropdownSelection = UpdateTitleDropdownSelection
 	end
 end
-
+--[[
+	==============================================
+	Plugin Initialization - cache titles where possible, recreate when necessary
+	==============================================
+--]]
 local function OnLoad(eventCode, name)
 
 	if name ~= ImprovedTitleizer.Name then return end
@@ -517,7 +560,11 @@ local function OnLoad(eventCode, name)
 
 	EVENT_MANAGER:UnregisterForEvent(ImprovedTitleizer.Name, EVENT_ADD_ON_LOADED)
 end
-
+--[[
+	==============================================
+	On new achievement, recreate the title list
+	==============================================
+--]]
 local function OnAchievementsAwarded(eventCode, name)
 	if logger ~= nil then logger:Info("New achievement awarded.") end
 	InitializeTitles()
@@ -528,7 +575,11 @@ EVENT_MANAGER:RegisterForEvent(ImprovedTitleizer.Name, EVENT_ADD_ON_LOADED, OnLo
 EVENT_MANAGER:RegisterForEvent(ImprovedTitleizer.Name, EVENT_ACHIEVEMENT_AWARDED, OnAchievementsAwarded)
 
 IMPROVEDTITLEIZER = ImprovedTitleizer
-
+--[[
+	==============================================
+	Slash Commands
+	==============================================
+--]]
 SLASH_COMMANDS["/refreshtitles"] = function()
 	InitializeTitles()
 	AdjustTitleMenu()

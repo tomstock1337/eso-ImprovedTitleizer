@@ -9,11 +9,12 @@ Sample categories:
 - Arena
 - Battlegrounds
 - Dungeon
-- Holiday
+- Holiday Event
+- Housing
+- Questing
+- Skills
+- Skyshards
 - Tales of Tribute
-- Skyshard Hunter
-- Savior
-- Master
 - Trials
 
 GitHub: https://github.com/tomstock1337/eso-ImprovedTitleizer

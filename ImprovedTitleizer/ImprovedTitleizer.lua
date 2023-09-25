@@ -1,22 +1,23 @@
 --[[
-	==============================================
-	Addon header information
-	==============================================
+  ==============================================
+  Addon header information
+  ==============================================
 --]]
 local ImprovedTitleizer = {}
 ImprovedTitleizer.Name = "ImprovedTitleizer"
 ImprovedTitleizer.DisplayName = "ImprovedTitleizer"
 ImprovedTitleizer.Author = "tomstock"
-ImprovedTitleizer.Version = "1.4"
-ImprovedTitleizer.Debug = false
+ImprovedTitleizer.Version = "1.5"
+ImprovedTitleizer.Debug = true
+ImprovedTitleizer.logger = nil
 --[[
-	==============================================
-	Setup LibDebugLogger as an optional dependency
-	==============================================
+  ==============================================
+  Setup LibDebugLogger as an optional dependency
+  ==============================================
 --]]
 if LibDebugLogger and ImprovedTitleizer.Debug then
-	logger = LibDebugLogger.Create(ImprovedTitleizer.Name)
-	logger:Info("Loaded logger")
+  ImprovedTitleizer.logger = LibDebugLogger.Create(ImprovedTitleizer.Name)
+  ImprovedTitleizer.logger:Info("Loaded logger")
 end
 
 local AVA_SORT_BY_RANK =
@@ -25,10 +26,10 @@ local AVA_SORT_BY_RANK =
     ["rank"] = {tiebreaker = "name", isNumeric = true},
 }
 --[[
-	==============================================
-	Utility Functions
-		spairs - For sorting keys in an array
-	==============================================
+  ==============================================
+  Utility Functions
+    spairs - For sorting keys in an array
+  ==============================================
 --]]
 local function spairs(t, order)
     -- collect the keys
@@ -54,18 +55,18 @@ local function spairs(t, order)
 end
 
 --[[
-	==============================================
-	Manual Categorization
-	  --ID = Achievement ID
-		--Rank = Sort override
-	==============================================
+  ==============================================
+  Manual Categorization
+    --ID = Achievement ID
+    --Rank = Sort override
+  ==============================================
 --]]
 local AchievmentIdsCategories =
 {
-	{
-		Name=GetString(SI_AVA_MENU_ALLIANCE_WAR_GROUP), --Alliance War
-		Entries=
-		{
+  {
+    Name=GetString(SI_AVA_MENU_ALLIANCE_WAR_GROUP), --Alliance War
+    Entries=
+    {
       {ID=92,Rank=1}, --Volunteer --Alliance War Volunteer
       {ID=93,Rank=2}, --Recruit --Alliance War Recruit
       {ID=94,Rank=3}, --Tyro --Alliance War Tyro
@@ -91,22 +92,22 @@ local AchievmentIdsCategories =
       {ID=113,Rank=23}, --Grand Warlord --Alliance War Grand Warlord
       {ID=114,Rank=24}, --Overlord --Alliance War Overlord
       {ID=705,Rank=25}, --Grand Overlord --Alliance War Grand Overlord
-		},
-	},
-	{
-		Name="Housing", --Housing
-		Entries=
-		{
+    },
+  },
+  {
+    Name="Housing", --Housing
+    Entries=
+    {
       {ID=1727}, --Clan Father --Clan <<player{Father/Mother}>>
       {ID=1728}, --Lord --<<player{Lord/Lady}>>
       {ID=1729}, --Councilor --Councilor
       {ID=1730}, --Count --<<player{Count/Countess}>>
-		},
-	},
-	{
-		Name="Arena",
-		Entries=
-		{
+    },
+  },
+  {
+    Name="Arena",
+    Entries=
+    {
       {ID=992}, --Dragonstar Arena Champion --Dragonstar Arena Champion
       {ID=1140}, --Boethiah's Scythe --Dragonstar Arena Conqueror
       {ID=1304}, --Maelstrom Arena Champion --Maelstrom Arena Champion
@@ -118,12 +119,12 @@ local AchievmentIdsCategories =
       {ID=2908}, --Spiritblood Champion --Vateshran Hollows Conqueror
       {ID=2912}, --Spirit Slayer --The Vateshran's Chosen
       {ID=2913}, --of the Undying Song --Hero of the Unending Song
-		}
-	},
-	{
-		Name=GetString(SI_ACTIVITY_FINDER_CATEGORY_BATTLEGROUNDS), --Battlegrounds
-		Entries=
-		{
+    }
+  },
+  {
+    Name=GetString(SI_ACTIVITY_FINDER_CATEGORY_BATTLEGROUNDS), --Battlegrounds
+    Entries=
+    {
       {ID=1895}, --Bloodletter --Pit Hero
       {ID=1898}, --Relic Hunter --Grand Relic Hunter
       {ID=1901}, --Relic Guardian --Grand Relic Guardian
@@ -139,12 +140,12 @@ local AchievmentIdsCategories =
       {ID=1918}, --Paragon --Paragon
       {ID=1921}, --The Merciless --Quadruple Kill
       {ID=1956}, --Chaos Keeper --Walk It Off
-		}
-	},
-	{
-		Name=GetString(SI_DUNGEON_FINDER_GENERAL_ACTIVITY_DESCRIPTOR), --Dungeon
-		Entries=
-		{
+    }
+  },
+  {
+    Name=GetString(SI_DUNGEON_FINDER_GENERAL_ACTIVITY_DESCRIPTOR), --Dungeon
+    Entries=
+    {
       {ID=1159}, --Deadlands Adept --Deadlands Savvy
       {ID=1538}, --Hist-Shadow --Shadows of the Hist Delver
       {ID=1691}, --Bane of Beastmen --Bloodroot Forge Conqueror
@@ -201,11 +202,11 @@ local AchievmentIdsCategories =
       {ID=3617}, --Bal Sunnar Champion --Shadow Blessed
       {ID=3618}, --Scrivener's Hall Champion --Scribe Savior
 
-		}
-	},
-	{
-		Name=GetString(SI_QUESTTYPE12), --Holiday Event
-		Entries={
+    }
+  },
+  {
+    Name=GetString(SI_QUESTTYPE12), --Holiday Event
+    Entries={
       {ID=1546}, --Sun's Dusk Reaper --An Unsparing Harvest
       {ID=1677}, --Magnanimous --Glory of Magnus
       {ID=1716}, --Lord of Misrule --<<player{Lord/Lady}>> of Misrule
@@ -214,11 +215,11 @@ local AchievmentIdsCategories =
       {ID=2453}, --Tin Soldier --The Upper Crust
       {ID=2458}, --Empieror --Messy Business
       {ID=2587}, --Witch --Wicked Writ Witch
-		}
-	},
-	{
-		Name=GetString(SI_QUESTTYPE17), --Tales of Tribute
-		Entries={
+    }
+  },
+  {
+    Name=GetString(SI_QUESTTYPE17), --Tales of Tribute
+    Entries={
       {ID=3349,Rank=1}, --Roister's Club Initiate --Roister's Club Initiate
       {ID=3350,Rank=2}, --Roister's Club Trainee --Roister's Club Trainee
       {ID=3351,Rank=3}, --Roister's Club Novice --Roister's Club Novice
@@ -232,11 +233,11 @@ local AchievmentIdsCategories =
       {ID=3339,Rank=11}, --High-Stakes Gambler --Voidsteel Roister
       {ID=3338,Rank=12}, --Game-Baron --Rubedite Roister
       {ID=3325,Rank=13}, --Club Virtuoso --Tribute Tactician
-		}
-	},
-	{
-		Name=GetString(SI_GUILDACTIVITYATTRIBUTEVALUE6), --Questing
-		Entries={
+    }
+  },
+  {
+    Name=GetString(SI_GUILDACTIVITYATTRIBUTEVALUE6), --Questing
+    Entries={
       {ID=61}, --Covenant Hero --Hero of the Daggerfall Covenant
       {ID=617}, --Pact Hero --Hero of the Ebonheart Pact
       {ID=618}, --Dominion Hero --Hero of the Aldmeri Dominion
@@ -268,21 +269,21 @@ local AchievmentIdsCategories =
       {ID=3556}, --Eye of the Queen --Buried Bequest
       {ID=3671}, --Champion of Apocrypha -- Fate's Chosen
       {ID=3674}, --Hero of Necrom --Hero of Necrom
-		}
-	},
-	{
-		Name=GetString(SI_GAMEPAD_SKILLS_SKY_SHARDS), --Skyshards
-		Entries={
+    }
+  },
+  {
+    Name=GetString(SI_GAMEPAD_SKILLS_SKY_SHARDS), --Skyshards
+    Entries={
       {ID=2516}, --Craglorn Skyshard Hunter
       {ID=2513}, --Dominion Skyshard Hunter
       {ID=2514}, --Covenant Skyshard Hunter
       {ID=2515}, --Pact Skyshard Hunter
       {ID=2517}, --Cyrodiil Skyshard Hunter
-		}
-	},
-	{
-		Name=GetString(SI_BINDING_NAME_TOGGLE_SKILLS), --Skills
-		Entries={
+    }
+  },
+  {
+    Name=GetString(SI_BINDING_NAME_TOGGLE_SKILLS), --Skills
+    Entries={
       {ID=494}, --Master Angler --Master Fisher
       {ID=702}, --Master Wizard --Arch-Mage
       {ID=703}, --Fighters Guild Victor --Fighters Guild Veteran
@@ -298,11 +299,11 @@ local AchievmentIdsCategories =
       {ID=2786}, --Sagacious Seer --Master of the Eye
       {ID=2792}, --Expert Excavator --Master of the Spade
       {ID=2805}, --Master Historian --Master Antiquarian
-		}
-	},
-	{
-		Name=GetString(SI_RAIDCATEGORY0), --Trials
-		Entries={
+    }
+  },
+  {
+    Name=GetString(SI_RAIDCATEGORY0), --Trials
+    Entries={
       {ID=1391}, --Dro-m'Athra Destroyer --Maw of Lorkhaj: Moons' Champion
       {ID=1462}, --Ophidian Overlord --Sanctum Ophidia Conqueror
       {ID=1474}, --Shehai Shatterer --Hel Ra Citadel Conqueror
@@ -347,14 +348,14 @@ local AchievmentIdsCategories =
       {ID=3564}, --Master of the Mind -- Dream Master
       {ID=3565}, --Sane and Clearheaded -- Mindmender
       {ID=3568}, --Tenacious Dreamer -- Tenacious Dreamer
-		}
-	}
+    }
+  }
 }
 
 --[[
-	==============================================
-	Used function documentation
-	==============================================
+  ==============================================
+  Used function documentation
+  ==============================================
 --]]
 local AllTitles={}
 --{TitleID=id, CategoryID=categoryId, CategoryName=categoryName,SubCategoryID=subCategory,SubCategoryName=subCategoryName,HasTitle=hasTitle}
@@ -383,213 +384,213 @@ local GetTitle                           = GetTitle -- I want original titles
 --Usage: local strTitle GetTitle(achievementId)
 
 --[[
-	==============================================
-	[Re-]Creates the title array for use in the addon
+  ==============================================
+  [Re-]Creates the title array for use in the addon
 
-	Goes through each achievement to get title details
-	==============================================
+  Goes through each achievement to get title details
+  ==============================================
 --]]
 local function InitializeTitles()
 
-	AllTitles = {}
-	--[[
-		==============================================
-		Gets title details for the specified achievement and adds to the array
-		==============================================
-	--]]
-	local function CheckAchievementsInLine(id, categoryId, categoryName, subCategory, subCategoryName)
-		--Go through every achievement looking for if a title exists for it.
-		local firstId = GetFirstAchievementInLine(id)
-		id = firstId > 0 and firstId or id
-		while id > 0 do
+  AllTitles = {}
+  --[[
+    ==============================================
+    Gets title details for the specified achievement and adds to the array
+    ==============================================
+  --]]
+  local function CheckAchievementsInLine(id, categoryId, categoryName, subCategory, subCategoryName)
+    --Go through every achievement looking for if a title exists for it.
+    local firstId = GetFirstAchievementInLine(id)
+    id = firstId > 0 and firstId or id
+    while id > 0 do
       local hasTitle, title = GetAchievementRewardTitle(id)
       if hasTitle then
-      	local achieveName = GetAchievementNameFromLink(GetAchievementLink(id))
-      	local name, description, points, icon, completed, date, time = GetAchievementInfo(id)
-      	local playerHasTitle = false
-      	local playerTitleIndex = -1
-      	for j=1,GetNumTitles() do
-      		if title == GetTitle(j) then
+        local achieveName = GetAchievementNameFromLink(GetAchievementLink(id))
+        local name, description, points, icon, completed, date, time = GetAchievementInfo(id)
+        local playerHasTitle = false
+        local playerTitleIndex = -1
+        for j=1,GetNumTitles() do
+          if title == GetTitle(j) then
             playerHasTitle = true
             playerTitleIndex = j
             break
-      		end
-      	end
-      	table.insert(AllTitles,1,{AchievementID=id,TitleID=playerTitleIndex,Title=title,CategoryID=categoryId, CategoryName=categoryName,SubCategoryID=subCategory,SubCategoryName=subCategoryName,HasTitle=playerHasTitle,AchievementName=achieveName,AchievementDescription=description},1);
+          end
+        end
+        table.insert(AllTitles,1,{AchievementID=id,TitleID=playerTitleIndex,Title=title,CategoryID=categoryId, CategoryName=categoryName,SubCategoryID=subCategory,SubCategoryName=subCategoryName,HasTitle=playerHasTitle,AchievementName=achieveName,AchievementDescription=description},1);
       end
       id = GetNextAchievementInLine(id)
-		end
-	end
-	for i=1,GetNumAchievementCategories() do
-		local categoryName, numSubCategories, numAchievements, earnedPoints, totalPoints = GetAchievementCategoryInfo(i)
-		for j=1,numAchievements do
+    end
+  end
+  for i=1,GetNumAchievementCategories() do
+    local categoryName, numSubCategories, numAchievements, earnedPoints, totalPoints = GetAchievementCategoryInfo(i)
+    for j=1,numAchievements do
       CheckAchievementsInLine(GetAchievementId(i,nil,j), i, categoryName)
-		end
+    end
 
-		for j=1,numSubCategories do
+    for j=1,numSubCategories do
       local subCategoryName, subNumAchievements = GetAchievementSubCategoryInfo(i, j)
       for k=1,subNumAchievements do
-      	CheckAchievementsInLine(GetAchievementId(i,j,k), i, categoryName, j,subCategoryName)
+        CheckAchievementsInLine(GetAchievementId(i,j,k), i, categoryName, j,subCategoryName)
       end
-		end
-	end
-	for i,sub in pairs(AchievmentIdsCategories) do
-		if (sub.Name==GetString(SI_AVA_MENU_ALLIANCE_WAR_GROUP)) then
+    end
+  end
+  for i,sub in pairs(AchievmentIdsCategories) do
+    if (sub.Name==GetString(SI_AVA_MENU_ALLIANCE_WAR_GROUP)) then
       for j,rank in pairs(sub.Entries) do
-      	rank.Icon="|t28:28:"..GetAvARankIcon(j*2).."|t "
+        rank.Icon="|t28:28:"..GetAvARankIcon(j*2).."|t "
       end
-		end
-	end
-	ImprovedTitleizer.savedVariables.numTitles = GetNumTitles()
-	ImprovedTitleizer.savedVariables.titleDetails = AllTitles
+    end
+  end
+  ImprovedTitleizer.savedVariables.numTitles = GetNumTitles()
+  ImprovedTitleizer.savedVariables.titleDetails = AllTitles
 end
 --[[
-	==============================================
-	Contstruct the Title Menu array
-	==============================================
+  ==============================================
+  Contstruct the Title Menu array
+  ==============================================
 --]]
 local function ConstructTitleMenu()
-	local LSM = LibScrollableMenu
+  local LSM = LibScrollableMenu
 
-	local function SortHelper(item1, item2, sortKey, sortType, sortOrder)
-		return ZO_TableOrderingFunction(item1, item2, sortKey or "name", sortType or ZO_SORT_BY_NAME, sortOrder or ZO_SORT_ORDER_UP)
-	end
+  local function SortHelper(item1, item2, sortKey, sortType, sortOrder)
+    return ZO_TableOrderingFunction(item1, item2, sortKey or "name", sortType or ZO_SORT_BY_NAME, sortOrder or ZO_SORT_ORDER_UP)
+  end
 
-	TitleMenu = {}
-	local subMenus={}
-	for i,sub in pairs(AchievmentIdsCategories) do
-		subMenus[sub.Name]={Entries={}}
-	end
-	for i,vTitle in pairs(AllTitles) do
-		if(vTitle.HasTitle) then
+  TitleMenu = {}
+  local subMenus={}
+  for i,sub in pairs(AchievmentIdsCategories) do
+    subMenus[sub.Name]={Entries={}}
+  end
+  for i,vTitle in pairs(AllTitles) do
+    if(vTitle.HasTitle) then
       local titlePlaced = false
       local toolTip = vTitle.AchievementName.."\n"..vTitle.CategoryName
       if debug==true then
-      	toolTip = toolTip.."\n"..vTitle.TitleID
+        toolTip = toolTip.."\n"..vTitle.TitleID
       end
       for k, vCategory in pairs(AchievmentIdsCategories) do
-      	for j,q in pairs(vCategory.Entries) do
-      		if vTitle.AchievementID==q.ID then
+        for j,q in pairs(vCategory.Entries) do
+          if vTitle.AchievementID==q.ID then
             table.insert(subMenus[vCategory.Name].Entries,{name=(q.Icon or "")..vTitle.Title, rank=q.Rank or 0, callback=function() SelectTitle(vTitle.TitleID) end,tooltip=toolTip})
             titlePlaced=true
-      		end
-      	end
+          end
+        end
       end
       if(titlePlaced==false) then
-      	table.insert(TitleMenu,{name=vTitle.Title, rank = 0, callback=function() SelectTitle(vTitle.TitleID) end,tooltip=toolTip})
+        table.insert(TitleMenu,{name=vTitle.Title, rank = 0, callback=function() SelectTitle(vTitle.TitleID) end,tooltip=toolTip})
       end
-		end
-	end
-	table.sort(TitleMenu, function(item1, item2) return SortHelper(item1, item2) end)
+    end
+  end
+  table.sort(TitleMenu, function(item1, item2) return SortHelper(item1, item2) end)
 
-	local i = 1
-	for header, titles in spairs(subMenus) do
-		if(table.getn(titles.Entries) > 0) then
+  local i = 1
+  for header, titles in spairs(subMenus) do
+    if(table.getn(titles.Entries) > 0) then
       table.sort(titles.Entries, function(item1, item2) return SortHelper(item1, item2, "rank",AVA_SORT_BY_RANK) end)
       table.insert(TitleMenu, i, {name=header, entries=titles.Entries})
       i = i + 1
-		end
-	end
-	-- add divider below "No Title" if there is more
-	if #TitleMenu > 0 then
-		table.insert(TitleMenu, 1, {name=LSM.DIVIDER})
-		i = i + 1
-	end
-	-- add divider below last submenu if there is more
-	if i <= #TitleMenu then
-		table.insert(TitleMenu, i, {name=LSM.DIVIDER})
-	end
+    end
+  end
+  -- add divider below "No Title" if there is more
+  if #TitleMenu > 0 then
+    table.insert(TitleMenu, 1, {name=LSM.DIVIDER})
+    i = i + 1
+  end
+  -- add divider below last submenu if there is more
+  if i <= #TitleMenu then
+    table.insert(TitleMenu, i, {name=LSM.DIVIDER})
+  end
 end
 --[[
-	==============================================
-	Adjust the UI
-	==============================================
+  ==============================================
+  Adjust the UI
+  ==============================================
 --]]
 local function SetupTitleEventManagement()
-	local LSM = LibScrollableMenu
+  local LSM = LibScrollableMenu
 
-	local orgAddDropdownRow = STATS.AddDropdownRow
-	STATS.AddDropdownRow = function(self, rowName)
-		local control = orgAddDropdownRow(self, rowName)
-		control.combobox = control:GetNamedChild("Dropdown")
-		control.scrollHelper = LSM.ScrollableDropdownHelper:New(self.control, control, 16)
-		STATS_SCENE:RegisterCallback("StateChange", OnStateChange)
-		control.scrollHelper.OnShow = function() end --don't change parenting
+  local orgAddDropdownRow = STATS.AddDropdownRow
+  STATS.AddDropdownRow = function(self, rowName)
+    local control = orgAddDropdownRow(self, rowName)
+    control.combobox = control:GetNamedChild("Dropdown")
+    control.scrollHelper = LSM.ScrollableDropdownHelper:New(self.control, control, 16)
+    STATS_SCENE:RegisterCallback("StateChange", OnStateChange)
+    control.scrollHelper.OnShow = function() end --don't change parenting
 
-		titlesRow = control
-		return control
-	end
+    local titlesRow = control
+    return control
+  end
 
-	local function UpdateTitleDropdownTitles(self, dropdown)
-		dropdown:ClearItems()
-		dropdown:AddItem(ZO_ComboBox:CreateItemEntry(GetString(SI_STATS_NO_TITLE), function() SelectTitle(nil) end), ZO_COMBOBOX_SUPRESS_UPDATE)
+  local function UpdateTitleDropdownTitles(self, dropdown)
+    dropdown:ClearItems()
+    dropdown:AddItem(ZO_ComboBox:CreateItemEntry(GetString(SI_STATS_NO_TITLE), function() SelectTitle(nil) end), ZO_COMBOBOX_SUPRESS_UPDATE)
 
-		ConstructTitleMenu()
+    ConstructTitleMenu()
 
-		dropdown:AddItems(TitleMenu)
+    dropdown:AddItems(TitleMenu)
 
-		self:UpdateTitleDropdownSelection(dropdown)
-	end
+    self:UpdateTitleDropdownSelection(dropdown)
+  end
 
-	-- Old function from before 8.2.5
-	-- New function gets the selected item by string value, new function selects by index (which is scambled due to the sorting)
-	function UpdateTitleDropdownSelection(self, dropdown)
+  -- Old function from before 8.2.5
+  -- New function gets the selected item by string value, new function selects by index (which is scambled due to the sorting)
+  function UpdateTitleDropdownSelection(self, dropdown)
     local currentTitleIndex = GetCurrentTitleIndex()
     if currentTitleIndex then
         dropdown:SetSelectedItemText(zo_strformat(GetTitle(currentTitleIndex), GetRawUnitName("player")))
     else
         dropdown:SetSelectedItemText(GetString(SI_STATS_NO_TITLE))
     end
-	end
+  end
 
-	if STATS and STATS.UpdateTitleDropdownTitles then
-		STATS.UpdateTitleDropdownTitles = UpdateTitleDropdownTitles
-		STATS.UpdateTitleDropdownSelection = UpdateTitleDropdownSelection
-	end
+  if STATS and STATS.UpdateTitleDropdownTitles then
+    STATS.UpdateTitleDropdownTitles = UpdateTitleDropdownTitles
+    STATS.UpdateTitleDropdownSelection = UpdateTitleDropdownSelection
+  end
 end
 --[[
-	==============================================
-	Plugin Initialization - cache titles where possible, recreate when necessary
-	==============================================
+  ==============================================
+  Plugin Initialization - cache titles where possible, recreate when necessary
+  ==============================================
 --]]
 local function OnLoad(eventCode, name)
 
-	if name ~= ImprovedTitleizer.Name then return end
+  if name ~= ImprovedTitleizer.Name then return end
 
-	ImprovedTitleizer.savedVariables = ZO_SavedVars:NewAccountWide("ImprovedTitleizerSavedVariables", 1, nil, {}) --Instead of nil you can also use GetWorldName() to save the SV server dependent
+  ImprovedTitleizer.savedVariables = ZO_SavedVars:NewAccountWide("ImprovedTitleizerSavedVariables", 1, nil, {}) --Instead of nil you can also use GetWorldName() to save the SV server dependent
 
-	if ImprovedTitleizer.savedVariables.lastversion == nil or ImprovedTitleizer.savedVariables.lastversion ~= ImprovedTitleizer.Version then
-		if logger ~= nil then logger:Info("New version of addon installed, recreating.") end
-		InitializeTitles()
-	elseif ImprovedTitleizer.savedVariables.lastESOversion == nil or ImprovedTitleizer.savedVariables.lastversion ~= GetESOVersionString() then
-		if logger ~= nil then logger:Info("New version of ESO installed, recreating.") end
-		InitializeTitles()
-	elseif ImprovedTitleizer.savedVariables.numTitles == nil or ImprovedTitleizer.savedVariables.titleDetails == nil then
-		if logger ~= nil then logger:Info("New or corrupt saved variables, recreating.") end
-		InitializeTitles()
-	elseif ImprovedTitleizer.savedVariables.numTitles ~= GetNumTitles() then
-		if logger ~= nil then logger:Info("New titles exist, recreating.") end
-		InitializeTitles()
-	else
-		if logger ~= nil then logger:Info("Loading titles from saved variables.") end
-		AllTitles=ImprovedTitleizer.savedVariables.titleDetails
-	end
-	ImprovedTitleizer.savedVariables.lastversion = ImprovedTitleizer.Version
-	ImprovedTitleizer.savedVariables.lastESOversion = GetESOVersionString()
+  if ImprovedTitleizer.savedVariables.lastversion == nil or ImprovedTitleizer.savedVariables.lastversion ~= ImprovedTitleizer.Version then
+    if ImprovedTitleizer.logger ~= nil then ImprovedTitleizer.logger:Info("New version of addon installed, recreating.") end
+    InitializeTitles()
+  elseif ImprovedTitleizer.savedVariables.lastESOversion == nil or ImprovedTitleizer.savedVariables.lastversion ~= GetESOVersionString() then
+    if ImprovedTitleizer.logger ~= nil then ImprovedTitleizer.logger:Info("New version of ESO installed, recreating.") end
+    InitializeTitles()
+  elseif ImprovedTitleizer.savedVariables.numTitles == nil or ImprovedTitleizer.savedVariables.titleDetails == nil then
+    if ImprovedTitleizer.logger ~= nil then ImprovedTitleizer.logger:Info("New or corrupt saved variables, recreating.") end
+    InitializeTitles()
+  elseif ImprovedTitleizer.savedVariables.numTitles ~= GetNumTitles() then
+    if ImprovedTitleizer.logger ~= nil then ImprovedTitleizer.logger:Info("New titles exist, recreating.") end
+    InitializeTitles()
+  else
+    if ImprovedTitleizer.logger ~= nil then ImprovedTitleizer.logger:Info("Loading titles from saved variables.") end
+    AllTitles=ImprovedTitleizer.savedVariables.titleDetails
+  end
+  ImprovedTitleizer.savedVariables.lastversion = ImprovedTitleizer.Version
+  ImprovedTitleizer.savedVariables.lastESOversion = GetESOVersionString()
 
-	SetupTitleEventManagement()
+  SetupTitleEventManagement()
 
-	EVENT_MANAGER:UnregisterForEvent(ImprovedTitleizer.Name, EVENT_ADD_ON_LOADED)
+  EVENT_MANAGER:UnregisterForEvent(ImprovedTitleizer.Name, EVENT_ADD_ON_LOADED)
 end
 --[[
-	==============================================
-	On new achievement, recreate the title list
-	==============================================
+  ==============================================
+  On new achievement, recreate the title list
+  ==============================================
 --]]
 local function OnAchievementsAwarded(eventCode, name)
-	if logger ~= nil then logger:Info("New achievement awarded.") end
-	InitializeTitles()
-	SetupTitleEventManagement()
+  if ImprovedTitleizer.logger ~= nil then ImprovedTitleizer.logger:Info("New achievement awarded.") end
+  InitializeTitles()
+  SetupTitleEventManagement()
 end
 
 EVENT_MANAGER:RegisterForEvent(ImprovedTitleizer.Name, EVENT_ADD_ON_LOADED, OnLoad)
@@ -597,11 +598,11 @@ EVENT_MANAGER:RegisterForEvent(ImprovedTitleizer.Name, EVENT_ACHIEVEMENT_AWARDED
 
 IMPROVEDTITLEIZER = ImprovedTitleizer
 --[[
-	==============================================
-	Slash Commands
-	==============================================
+  ==============================================
+  Slash Commands
+  ==============================================
 --]]
 SLASH_COMMANDS["/refreshtitles"] = function()
-	InitializeTitles()
-	SetupTitleEventManagement()
+  InitializeTitles()
+  SetupTitleEventManagement()
 end

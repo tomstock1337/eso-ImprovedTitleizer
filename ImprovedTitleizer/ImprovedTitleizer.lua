@@ -7,7 +7,7 @@ local ImprovedTitleizer = {}
 ImprovedTitleizer.Name = "ImprovedTitleizer"
 ImprovedTitleizer.DisplayName = "ImprovedTitleizer"
 ImprovedTitleizer.Author = "tomstock"
-ImprovedTitleizer.Version = "1.4"
+ImprovedTitleizer.Version = "1.5"
 ImprovedTitleizer.Debug = false
 --[[
 	==============================================

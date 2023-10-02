@@ -379,6 +379,10 @@ local GetAchievementId                   = GetAchievementId
 local GetAchievementInfo                 = GetAchievementInfo
 --Usage local name, description, points, icon, completed, date, time = GetAchievementInfo(achievementId)
 
+-- ADDED: Titles could also be saved an an SV with a hold time for new status. That way they will remain in the Dropdown
+-- as new for up to the hold time. Then, any added by the event will remain as new until mouse-over even after reload.
+local newTitles = {}
+local achievmentIdMap = {}
 
 local GetTitle                           = GetTitle -- I want original titles
 --Usage: local strTitle GetTitle(achievementId)
@@ -404,9 +408,17 @@ local function InitializeTitles()
     id = firstId > 0 and firstId or id
     while id > 0 do
       local hasTitle, title = GetAchievementRewardTitle(id)
+
       if hasTitle then
+  -- ADDED: to create a map of all achievement Ids that are titles, to use as reference for the EVENT_ACHIEVEMENT_AWARDED
+  -- May also need to use more detail in finding titles based on achievements in the EVENT_ACHIEVEMENT_AWARDED and use
+  -- that info as the map
+		achievmentIdMap[id] = true
+
         local achieveName = GetAchievementNameFromLink(GetAchievementLink(id))
         local name, description, points, icon, completed, date, time = GetAchievementInfo(id)
+	-- Just used to test the new icon in LibScrollableMenu
+	--	if newTitles[name] == nil then newTitles[name] = true end
         local playerHasTitle = false
         local playerTitleIndex = -1
         for j=1,GetNumTitles() do
@@ -437,7 +449,7 @@ local function InitializeTitles()
   for i,sub in pairs(AchievmentIdsCategories) do
     if (sub.Name==GetString(SI_AVA_MENU_ALLIANCE_WAR_GROUP)) then
       for j,rank in pairs(sub.Entries) do
-        rank.Icon="|t28:28:"..GetAvARankIcon(j*2).."|t "
+        rank.Icon=GetAvARankIcon(j*2)
       end
     end
   end
@@ -471,7 +483,19 @@ local function ConstructTitleMenu()
       for k, vCategory in pairs(AchievmentIdsCategories) do
         for j,q in pairs(vCategory.Entries) do
           if vTitle.AchievementID==q.ID then
-            table.insert(subMenus[vCategory.Name].Entries,{name=(q.Icon or "")..vTitle.Title, rank=q.Rank or 0, callback=function() SelectTitle(vTitle.TitleID) end,tooltip=toolTip})
+			if newTitles[vTitle.Title] then
+				vCategory.hasNew = true
+			end
+
+			local newEntry = {
+				name=vTitle.Title,
+				rank=q.Rank or 0,
+				icon = q.Icon,
+				callback=function() SelectTitle(vTitle.TitleID) end,
+				tooltip=toolTip,
+				isNew = newTitles[vTitle.Title] or nil
+			}
+            table.insert(subMenus[vCategory.Name].Entries, newEntry)
             titlePlaced=true
           end
         end
@@ -487,7 +511,7 @@ local function ConstructTitleMenu()
   for header, titles in spairs(subMenus) do
     if(table.getn(titles.Entries) > 0) then
       table.sort(titles.Entries, function(item1, item2) return SortHelper(item1, item2, "rank",AVA_SORT_BY_RANK) end)
-      table.insert(TitleMenu, i, {name=header, entries=titles.Entries})
+      table.insert(TitleMenu, i, {name=header, entries=titles.Entries, isNew = titles.hasNew})
       i = i + 1
     end
   end
@@ -581,6 +605,21 @@ local function OnLoad(eventCode, name)
   SetupTitleEventManagement()
 
   EVENT_MANAGER:UnregisterForEvent(ImprovedTitleizer.Name, EVENT_ADD_ON_LOADED)
+
+	EVENT_MANAGER:RegisterForEvent("ImprovedTitleizer", EVENT_ACHIEVEMENT_AWARDED, function(_, name, points, id)
+		-- This seams to work.
+		if achievmentIdMap[id] then
+				newTitles[name] = true
+				-- I don't think we need to force any refresh here since the menu is not going to be open at the time
+		end
+	end)
+
+	LibScrollableMenu:RegisterCallback('NewStatusUpdated', function(data, entry)
+		-- This callback is fired on mouse-over of entries that were flagged as new.
+		if newTitles[data.name] then
+			newTitles[data.name] = nil
+		end
+	end)
 end
 --[[
   ==============================================

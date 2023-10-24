@@ -6,8 +6,8 @@
 local ImprovedTitleizer = {}
 ImprovedTitleizer.Name = "ImprovedTitleizer"
 ImprovedTitleizer.DisplayName = "ImprovedTitleizer"
-ImprovedTitleizer.Author = "tomstock"
-ImprovedTitleizer.Version = "1.5"
+ImprovedTitleizer.Author = "tomstock, IsJustaGhost, Baertram[, Kyoma]"
+ImprovedTitleizer.Version = "1.6"
 ImprovedTitleizer.Debug = true
 ImprovedTitleizer.logger = nil
 --[[

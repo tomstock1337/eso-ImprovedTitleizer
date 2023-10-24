@@ -7,10 +7,10 @@
 ## Description: This addon sorts the titles in your stat screen by name and also moves all pvp rank titles to a seperate submenu. Should work with all languages.
 ## Version: 1.6
 ## AddOnVersion:0106
-## Author: tomstock, IsJustaGhost
-## APIVersion: 101039 101040
+## Author: tomstock, IsJustaGhost, Baertram[, Kyoma]
+## APIVersion: 101040 101041
 ## SavedVariables: ImprovedTitleizerSavedVariables
 ## OptionalDependsOn: LibDebugLogger
-## DependsOn: LibCustomMenu LibScrollableMenu
+## DependsOn: LibCustomMenu>=721 LibScrollableMenu>=0102
 
 ImprovedTitleizer.lua

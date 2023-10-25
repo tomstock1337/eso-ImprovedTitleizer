@@ -8,7 +8,7 @@ ImprovedTitleizer.Name = "ImprovedTitleizer"
 ImprovedTitleizer.DisplayName = "ImprovedTitleizer"
 ImprovedTitleizer.Author = "tomstock, IsJustaGhost, Baertram[, Kyoma]"
 ImprovedTitleizer.Version = "1.6"
-ImprovedTitleizer.Debug = true
+ImprovedTitleizer.Debug = false --Todo: Change that to false before setting live, or else tooltips will contain an extra ID row at the end
 ImprovedTitleizer.logger = nil
 --[[
   ==============================================
@@ -358,6 +358,7 @@ local AchievmentIdsCategories =
   ==============================================
 --]]
 local AllTitles={}
+
 --{TitleID=id, CategoryID=categoryId, CategoryName=categoryName,SubCategoryID=subCategory,SubCategoryName=subCategoryName,HasTitle=hasTitle}
 
 local TitleMenu = {}
@@ -416,6 +417,11 @@ local function InitializeTitles()
 		achievmentIdMap[id] = true
 
         local achieveName = GetAchievementNameFromLink(GetAchievementLink(id))
+        --Baetrram: If achieveName contains a "player" placeholder it needs to be replaced via zo_strformat with GetUnitRawName("player"). Else the achieveName will look like this in the end:
+        --[4]AchievementName: <<player{Königsmacher/Königsmacherin}>>
+        if zo_plainstrfind(achieveName, "<<player{") ~= nil then
+          achieveName = zo_strformat(achieveName, GetRawUnitName("player"))
+        end
         local name, description, points, icon, completed, date, time = GetAchievementInfo(id)
 	-- Just used to test the new icon in LibScrollableMenu
 	--	if newTitles[name] == nil then newTitles[name] = true end
@@ -464,6 +470,8 @@ end
 local function ConstructTitleMenu()
   local LSM = LibScrollableMenu
 
+  local doDebug = ImprovedTitleizer.Debug
+
   local function SortHelper(item1, item2, sortKey, sortType, sortOrder)
     return ZO_TableOrderingFunction(item1, item2, sortKey or "name", sortType or ZO_SORT_BY_NAME, sortOrder or ZO_SORT_ORDER_UP)
   end
@@ -477,7 +485,8 @@ local function ConstructTitleMenu()
     if(vTitle.HasTitle) then
       local titlePlaced = false
       local toolTip = vTitle.AchievementName.."\n"..vTitle.CategoryName
-      if debug==true then
+      if doDebug==true then
+--d("["..tostring(i) .."]AchievementName: " ..tostring(vTitle.AchievementName) .. ", category: " ..tostring(vTitle.CategoryName))
         toolTip = toolTip.."\n"..vTitle.TitleID
       end
       for k, vCategory in pairs(AchievmentIdsCategories) do
@@ -531,17 +540,20 @@ end
   ==============================================
 --]]
 local function SetupTitleEventManagement()
-  local LSM = LibScrollableMenu
+  --local LSM = LibScrollableMenu --Baertram Not used anymore. Using API function AddCustomScrollableComboBoxDropdownMenu instead
 
   local orgAddDropdownRow = STATS.AddDropdownRow
   STATS.AddDropdownRow = function(self, rowName)
     local control = orgAddDropdownRow(self, rowName)
-    control.combobox = control:GetNamedChild("Dropdown")
-    control.scrollHelper = LSM.ScrollableDropdownHelper:New(self.control, control, 16)
-    STATS_SCENE:RegisterCallback("StateChange", OnStateChange)
+    local comboBox = control:GetNamedChild("Dropdown")
+    control.combobox = comboBox
+    --control.scrollHelper = LSM.ScrollableDropdownHelper:New(self.control, control, 16) --use the API function instead
+    control.scrollHelper = AddCustomScrollableComboBoxDropdownMenu(self.control, comboBox, {visibleRowsDropdown=16, visibleRowsSubmenu=16, sortEntries=false})
+
+    --STATS_SCENE:RegisterCallback("StateChange", OnStateChange) --Beartram: global or local function OnStateChange does not exist?
     control.scrollHelper.OnShow = function() end --don't change parenting
 
-    local titlesRow = control
+    --local titlesRow = control --Beartram: no used anywhere
     return control
   end
 

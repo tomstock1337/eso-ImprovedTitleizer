@@ -531,17 +531,20 @@ end
   ==============================================
 --]]
 local function SetupTitleEventManagement()
-  local LSM = LibScrollableMenu
+  --local LSM = LibScrollableMenu --Baertram Not used anymore. Using API function AddCustomScrollableComboBoxDropdownMenu instead
 
   local orgAddDropdownRow = STATS.AddDropdownRow
   STATS.AddDropdownRow = function(self, rowName)
     local control = orgAddDropdownRow(self, rowName)
-    control.combobox = control:GetNamedChild("Dropdown")
-    control.scrollHelper = LSM.ScrollableDropdownHelper:New(self.control, control, 16)
-    STATS_SCENE:RegisterCallback("StateChange", OnStateChange)
+    local comboBox = control:GetNamedChild("Dropdown")
+    control.combobox = comboBox
+    --control.scrollHelper = LSM.ScrollableDropdownHelper:New(self.control, control, 16) --use the API function instead
+    control.scrollHelper = AddCustomScrollableComboBoxDropdownMenu(self.control, comboBox, {visibleRowsDropdown=16, visibleRowsSubmenu=16, sortEntries=false})
+
+    --STATS_SCENE:RegisterCallback("StateChange", OnStateChange) --Beartram: global or local function OnStateChange does not exist?
     control.scrollHelper.OnShow = function() end --don't change parenting
 
-    local titlesRow = control
+    --local titlesRow = control --Beartram: no used anywhere
     return control
   end
 
@@ -561,7 +564,7 @@ local function SetupTitleEventManagement()
   function UpdateTitleDropdownSelection(self, dropdown)
     local currentTitleIndex = GetCurrentTitleIndex()
     if currentTitleIndex then
-        dropdown:SetSelectedItemText(zo_strformat(GetTitle(currentTitleIndex), GetRawUnitName("player")))
+        dropdown:SetSelectedItemText(zo_strformat(GetTitle(currentTitleIndex), GetRawUnitName("player"))) --Baertram: I think this might be a problem as raw player names could contain the ^m or ^f gender suffix?
     else
         dropdown:SetSelectedItemText(GetString(SI_STATS_NO_TITLE))
     end

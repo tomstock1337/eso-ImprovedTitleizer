@@ -7,7 +7,7 @@ local ImprovedTitleizer = {}
 ImprovedTitleizer.Name = "ImprovedTitleizer"
 ImprovedTitleizer.DisplayName = "ImprovedTitleizer"
 ImprovedTitleizer.Author = "tomstock, IsJustaGhost, Baertram[, Kyoma]"
-ImprovedTitleizer.Version = "1.6"
+ImprovedTitleizer.Version = "1.7"
 ImprovedTitleizer.Debug = false --Todo: Change that to false before setting live, or else tooltips will contain an extra ID row at the end
 ImprovedTitleizer.logger = nil
 --[[

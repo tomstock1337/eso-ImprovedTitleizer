@@ -17,4 +17,8 @@ Sample categories:
 - Tales of Tribute
 - Trials
 
+Required Pre-requisite Addon:
+LibCustomMenu
+LibScrollableMenu
+
 GitHub: https://github.com/tomstock1337/eso-ImprovedTitleizer

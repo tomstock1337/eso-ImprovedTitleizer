@@ -5,8 +5,8 @@
 
 ## Title: ImprovedTitleizer
 ## Description: This addon sorts the titles in your stat screen by name and also moves all pvp rank titles to a seperate submenu. Should work with all languages.
-## Version: 1.7
-## AddOnVersion:0107
+## Version: 1.8
+## AddOnVersion:0108
 ## Author: tomstock, IsJustaGhost, Baertram[, Kyoma]
 ## APIVersion: 101041 101042
 ## SavedVariables: ImprovedTitleizerSavedVariables

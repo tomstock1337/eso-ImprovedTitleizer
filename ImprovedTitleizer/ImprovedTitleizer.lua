@@ -8,7 +8,11 @@ ImprovedTitleizer.Name = "ImprovedTitleizer"
 ImprovedTitleizer.DisplayName = "ImprovedTitleizer"
 ImprovedTitleizer.Author = "tomstock, IsJustaGhost, Baertram[, Kyoma]"
 ImprovedTitleizer.Version = "1.7"
+
 ImprovedTitleizer.Debug = false --Todo: Change that to false before setting live, or else tooltips will contain an extra ID row at the end
+
+local LSM = LibScrollableMenu
+
 ImprovedTitleizer.logger = nil
 --[[
   ==============================================
@@ -468,8 +472,6 @@ end
   ==============================================
 --]]
 local function ConstructTitleMenu()
-  local LSM = LibScrollableMenu
-
   local doDebug = ImprovedTitleizer.Debug
 
   local function SortHelper(item1, item2, sortKey, sortType, sortOrder)
@@ -539,8 +541,10 @@ end
   Adjust the UI
   ==============================================
 --]]
+
+local wasAlreadyReplacingZO_StatsFuncs = false
 local function SetupTitleEventManagement()
-  --local LSM = LibScrollableMenu --Baertram Not used anymore. Using API function AddCustomScrollableComboBoxDropdownMenu instead
+  if wasAlreadyReplacingZO_StatsFuncs then return end
 
   local orgAddDropdownRow = STATS.AddDropdownRow
   STATS.AddDropdownRow = function(self, rowName)
@@ -548,7 +552,10 @@ local function SetupTitleEventManagement()
     local comboBox = control:GetNamedChild("Dropdown")
     control.combobox = comboBox
     --control.scrollHelper = LSM.ScrollableDropdownHelper:New(self.control, control, 16) --use the API function instead
-    control.scrollHelper = AddCustomScrollableComboBoxDropdownMenu(self.control, comboBox, {visibleRowsDropdown=16, visibleRowsSubmenu=16, sortEntries=false})
+    --Prevent duplicate LibScrollableMenu init
+    if control.scrollHelper == nil then
+      control.scrollHelper = AddCustomScrollableComboBoxDropdownMenu(self.control, comboBox, {visibleRowsDropdown=16, visibleRowsSubmenu=16, sortEntries=false})
+    end
 
     --STATS_SCENE:RegisterCallback("StateChange", OnStateChange) --Beartram: global or local function OnStateChange does not exist?
     control.scrollHelper.OnShow = function() end --don't change parenting
@@ -573,9 +580,9 @@ local function SetupTitleEventManagement()
   function UpdateTitleDropdownSelection(self, dropdown)
     local currentTitleIndex = GetCurrentTitleIndex()
     if currentTitleIndex then
-        dropdown:SetSelectedItemText(zo_strformat(GetTitle(currentTitleIndex), GetRawUnitName("player")))
+      dropdown:SetSelectedItemText(zo_strformat(GetTitle(currentTitleIndex), GetRawUnitName("player")))
     else
-        dropdown:SetSelectedItemText(GetString(SI_STATS_NO_TITLE))
+      dropdown:SetSelectedItemText(GetString(SI_STATS_NO_TITLE))
     end
   end
 
@@ -583,6 +590,8 @@ local function SetupTitleEventManagement()
     STATS.UpdateTitleDropdownTitles = UpdateTitleDropdownTitles
     STATS.UpdateTitleDropdownSelection = UpdateTitleDropdownSelection
   end
+
+  wasAlreadyReplacingZO_StatsFuncs = true
 end
 --[[
   ==============================================
@@ -592,6 +601,7 @@ end
 local function OnLoad(eventCode, name)
 
   if name ~= ImprovedTitleizer.Name then return end
+  EVENT_MANAGER:UnregisterForEvent(ImprovedTitleizer.Name, EVENT_ADD_ON_LOADED)
 
   ImprovedTitleizer.savedVariables = ZO_SavedVars:NewAccountWide("ImprovedTitleizerSavedVariables", 1, nil, {}) --Instead of nil you can also use GetWorldName() to save the SV server dependent
 
@@ -614,40 +624,37 @@ local function OnLoad(eventCode, name)
   ImprovedTitleizer.savedVariables.lastversion = ImprovedTitleizer.Version
   ImprovedTitleizer.savedVariables.lastESOversion = GetESOVersionString()
 
+
   SetupTitleEventManagement()
 
-  EVENT_MANAGER:UnregisterForEvent(ImprovedTitleizer.Name, EVENT_ADD_ON_LOADED)
-
-	EVENT_MANAGER:RegisterForEvent("ImprovedTitleizer", EVENT_ACHIEVEMENT_AWARDED, function(_, name, points, id)
-		-- This seams to work.
-		if achievmentIdMap[id] then
-				newTitles[name] = true
-				-- I don't think we need to force any refresh here since the menu is not going to be open at the time
-		end
-	end)
-
-	LibScrollableMenu:RegisterCallback('NewStatusUpdated', function(data, entry)
-		-- This callback is fired on mouse-over of entries that were flagged as new.
-		if newTitles[data.name] then
-			newTitles[data.name] = nil
-		end
-	end)
-end
 --[[
   ==============================================
-  On new achievement, recreate the title list
+  On new achievement, recreate the title list and update "new" flags for LSM
   ==============================================
 --]]
-local function OnAchievementsAwarded(eventCode, name)
-  if ImprovedTitleizer.logger ~= nil then ImprovedTitleizer.logger:Info("New achievement awarded.") end
-  InitializeTitles()
-  SetupTitleEventManagement()
+  local function OnAchievementsAwarded(eventCode, name, points, id)
+    if ImprovedTitleizer.logger ~= nil then ImprovedTitleizer.logger:Info("New achievement awarded: " .. tostring(name) .. ", ID: " ..tostring(id)) end
+    InitializeTitles()
+
+      -- This seams to work to update LibScrollableMenu needed information for "new" flags
+      if achievmentIdMap[id] then
+        newTitles[name] = true
+        -- I don't think we need to force any refresh here since the menu is not going to be open at the time
+      end
+  end
+  EVENT_MANAGER:RegisterForEvent(ImprovedTitleizer.Name, EVENT_ACHIEVEMENT_AWARDED, OnAchievementsAwarded)
+
+  --LibScrollableMenu
+  LSM:RegisterCallback('NewStatusUpdated', function(data, entry)
+      -- This callback is fired on mouse-over of entries that were flagged as new.
+      if newTitles[data.name] then
+          newTitles[data.name] = nil
+      end
+  end)
 end
 
-EVENT_MANAGER:RegisterForEvent(ImprovedTitleizer.Name, EVENT_ADD_ON_LOADED, OnLoad)
-EVENT_MANAGER:RegisterForEvent(ImprovedTitleizer.Name, EVENT_ACHIEVEMENT_AWARDED, OnAchievementsAwarded)
 
-IMPROVEDTITLEIZER = ImprovedTitleizer
+
 --[[
   ==============================================
   Slash Commands
@@ -655,5 +662,13 @@ IMPROVEDTITLEIZER = ImprovedTitleizer
 --]]
 SLASH_COMMANDS["/refreshtitles"] = function()
   InitializeTitles()
-  SetupTitleEventManagement()
 end
+
+
+--[[
+  ==============================================
+  AddOn global and loading
+  ==============================================
+--]]
+IMPROVEDTITLEIZER = ImprovedTitleizer
+EVENT_MANAGER:RegisterForEvent(ImprovedTitleizer.Name, EVENT_ADD_ON_LOADED, OnLoad)

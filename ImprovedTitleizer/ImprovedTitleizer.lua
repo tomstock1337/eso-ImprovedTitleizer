@@ -205,6 +205,12 @@ local AchievmentIdsCategories =
       {ID=3535}, --Magnastylus in the Making --Curator's Champion
       {ID=3617}, --Bal Sunnar Champion --Shadow Blessed
       {ID=3618}, --Scrivener's Hall Champion --Scribe Savior
+      {ID=4010}, --Bedlam Veil Champion --the Intervener
+      {ID=3857}, --Unshakeable Fervor --Bedlam's Disciple
+      {ID=3853}, --Lithe and Clever --the Self-governing
+      {ID=4009}, --Oathsworn Pit Champion --the Vengeful
+      {ID=3816}, --Lighting the Embers --Oathsworn
+      {ID=3812}, --Scorched but Surviving --Pitmaster
 
     }
   },
@@ -352,6 +358,11 @@ local AchievmentIdsCategories =
       {ID=3564}, --Master of the Mind -- Dream Master
       {ID=3565}, --Sane and Clearheaded -- Mindmender
       {ID=3568}, --Tenacious Dreamer -- Tenacious Dreamer
+      {ID=4019}, --Arcane Stabilizer --the Unstoppable
+      {ID=4023}, --Retrieval Specialist --the Unshattered
+      {ID=4015}, --Lucent Citadel Conqueror --Crystal Sharp
+      {ID=4013}, --Lucent Citadel Vanquisher --Luminous
+      {ID=4020}, --Knot Worthy --Arcane Stabilizer
     }
   }
 }
@@ -415,10 +426,10 @@ local function InitializeTitles()
       local hasTitle, title = GetAchievementRewardTitle(id)
 
       if hasTitle then
-  -- ADDED: to create a map of all achievement Ids that are titles, to use as reference for the EVENT_ACHIEVEMENT_AWARDED
-  -- May also need to use more detail in finding titles based on achievements in the EVENT_ACHIEVEMENT_AWARDED and use
-  -- that info as the map
-		achievmentIdMap[id] = true
+        -- ADDED: to create a map of all achievement Ids that are titles, to use as reference for the EVENT_ACHIEVEMENT_AWARDED
+        -- May also need to use more detail in finding titles based on achievements in the EVENT_ACHIEVEMENT_AWARDED and use
+        -- that info as the map
+        achievmentIdMap[id] = true
 
         local achieveName = GetAchievementNameFromLink(GetAchievementLink(id))
         --Baetrram: If achieveName contains a "player" placeholder it needs to be replaced via zo_strformat with GetUnitRawName("player"). Else the achieveName will look like this in the end:
@@ -427,8 +438,8 @@ local function InitializeTitles()
           achieveName = zo_strformat(achieveName, GetRawUnitName("player"))
         end
         local name, description, points, icon, completed, date, time = GetAchievementInfo(id)
-	-- Just used to test the new icon in LibScrollableMenu
-	--	if newTitles[name] == nil then newTitles[name] = true end
+        -- Just used to test the new icon in LibScrollableMenu
+        --	if newTitles[name] == nil then newTitles[name] = true end
         local playerHasTitle = false
         local playerTitleIndex = -1
         for j=1,GetNumTitles() do
@@ -488,24 +499,24 @@ local function ConstructTitleMenu()
       local titlePlaced = false
       local toolTip = vTitle.AchievementName.."\n"..vTitle.CategoryName
       if doDebug==true then
---d("["..tostring(i) .."]AchievementName: " ..tostring(vTitle.AchievementName) .. ", category: " ..tostring(vTitle.CategoryName))
+        --d("["..tostring(i) .."]AchievementName: " ..tostring(vTitle.AchievementName) .. ", category: " ..tostring(vTitle.CategoryName))
         toolTip = toolTip.."\n"..vTitle.TitleID
       end
       for k, vCategory in pairs(AchievmentIdsCategories) do
         for j,q in pairs(vCategory.Entries) do
           if vTitle.AchievementID==q.ID then
-			if newTitles[vTitle.Title] then
-				vCategory.hasNew = true
-			end
+            if newTitles[vTitle.Title] then
+              vCategory.hasNew = true
+            end
 
-			local newEntry = {
-				name=vTitle.Title,
-				rank=q.Rank or 0,
-				icon = q.Icon,
-				callback=function() SelectTitle(vTitle.TitleID) end,
-				tooltip=toolTip,
-				isNew = newTitles[vTitle.Title] or nil
-			}
+            local newEntry = {
+              name=vTitle.Title,
+              rank=q.Rank or 0,
+              icon = q.Icon,
+              callback=function() SelectTitle(vTitle.TitleID) end,
+              tooltip=toolTip,
+              isNew = newTitles[vTitle.Title] or nil
+            }
             table.insert(subMenus[vCategory.Name].Entries, newEntry)
             titlePlaced=true
           end

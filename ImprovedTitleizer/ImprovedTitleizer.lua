@@ -483,7 +483,6 @@ end
   ==============================================
 --]]
 local function ConstructTitleMenu()
-  local doDebug = ImprovedTitleizer.Debug
 
   local function SortHelper(item1, item2, sortKey, sortType, sortOrder)
     return ZO_TableOrderingFunction(item1, item2, sortKey or "name", sortType or ZO_SORT_BY_NAME, sortOrder or ZO_SORT_ORDER_UP)
@@ -495,24 +494,33 @@ local function ConstructTitleMenu()
     subMenus[sub.Name]={Entries={}}
   end
   for i,vTitle in pairs(AllTitles) do
-    if(vTitle.HasTitle) then
-      local titlePlaced = false
-      local toolTip = vTitle.AchievementName.."\n"..vTitle.CategoryName
-      if doDebug==true then
-        --d("["..tostring(i) .."]AchievementName: " ..tostring(vTitle.AchievementName) .. ", category: " ..tostring(vTitle.CategoryName))
-        toolTip = toolTip.."\n"..vTitle.TitleID
-      end
-      for k, vCategory in pairs(AchievmentIdsCategories) do
-        for j,q in pairs(vCategory.Entries) do
-          if vTitle.AchievementID==q.ID then
-            if newTitles[vTitle.Title] then
-              vCategory.hasNew = true
-            end
 
+    local titlePlaced = false
+    local isSelectable = true
+    local title = vTitle.Title
+    local toolTip = vTitle.AchievementName.."\n"..vTitle.CategoryName
+
+    if(not vTitle.HasTitle and ImprovedTitleizer.Debug) then
+      isSelectable = false;
+    else isSelectable = true;
+    end;
+
+    if ImprovedTitleizer.Debug then
+      title = title.."  #"..vTitle.TitleID.."  HasTitle:".. tostring(vTitle.HasTitle)
+    end
+
+    for k, vCategory in pairs(AchievmentIdsCategories) do
+      for j,q in pairs(vCategory.Entries) do
+        if vTitle.AchievementID==q.ID and titlePlaced==false then
+          if newTitles[vTitle.Title] then
+            vCategory.hasNew = true
+          end
+          if((vTitle.HasTitle or ImprovedTitleizer.Debug) and titlePlaced==false) then
             local newEntry = {
-              name=vTitle.Title,
+              name=title,
               rank=q.Rank or 0,
               icon = q.Icon,
+              enabled = function() return isSelectable end,
               callback=function() SelectTitle(vTitle.TitleID) end,
               tooltip=toolTip,
               isNew = newTitles[vTitle.Title] or nil
@@ -522,9 +530,9 @@ local function ConstructTitleMenu()
           end
         end
       end
-      if(titlePlaced==false) then
-        table.insert(TitleMenu,{name=vTitle.Title, rank = 0, callback=function() SelectTitle(vTitle.TitleID) end,tooltip=toolTip})
-      end
+    end
+    if(titlePlaced==false) then
+      table.insert(TitleMenu,{name=title, rank = 0, callback=function() SelectTitle(vTitle.TitleID) end,tooltip=toolTip,enabled = function() return isSelectable end})
     end
   end
   table.sort(TitleMenu, function(item1, item2) return SortHelper(item1, item2) end)

@@ -8,7 +8,8 @@ ImprovedTitleizer.Name = "ImprovedTitleizer"
 ImprovedTitleizer.DisplayName = "Improved Titleizer"
 ImprovedTitleizer.Author = "tomstock, IsJustaGhost, Baertram[, Kyoma]"
 ImprovedTitleizer.Version = "1.9"
-ImprovedTitleizer.DefSortByAchieveCat = false
+ImprovedTitleizer.DefSortByAchieveCat = true
+ImprovedTitleizer.DefShowMissingTitles = false
 
 ImprovedTitleizer.Debug = false --Todo: Change that to false before setting live, or else tooltips will contain an extra ID row at the end
 
@@ -494,7 +495,7 @@ local function ConstructTitleMenu()
     local catTitle =vTitle.CategoryName
     local toolTip = GetString(SI_GAMEPAD_ACHIEVEMENTS_CHARACTER_PERSISTENT)..":\n"..vTitle.AchievementName
 
-    if(not vTitle.HasTitle and ImprovedTitleizer.Debug) then
+    if(not vTitle.HasTitle and (ImprovedTitleizer.Debug or ImprovedTitleizer.savedVariables.showmissingtitles)) then
       isEnabled = false;
     else isEnabled = true;
     end;
@@ -512,7 +513,7 @@ local function ConstructTitleMenu()
           end
           if(titlePlaced==false) then
             titlePlaced=true
-            if (vTitle.HasTitle or ImprovedTitleizer.Debug) then
+            if (vTitle.HasTitle or ImprovedTitleizer.Debug or ImprovedTitleizer.savedVariables.showmissingtitles) then
               local newEntry = {
                 name=title,
                 categoryId=vTitle.CategoryID,
@@ -686,10 +687,12 @@ local function OnLoad(eventCode, name)
   if ImprovedTitleizer.savedVariables.sortbyachievecat == nil then
     ImprovedTitleizer.savedVariables.sortbyachievecat = DefSortByAchieveCat
   end
+  if ImprovedTitleizer.savedVariables.showmissingtitles == nil then
+    ImprovedTitleizer.savedVariables.showmissingtitles = DefShowMissingTitles
+  end
 
   ImprovedTitleizer.savedVariables.lastversion = ImprovedTitleizer.Version
   ImprovedTitleizer.savedVariables.lastESOversion = GetESOVersionString()
-
 
   SetupTitleEventManagement()
 
@@ -743,6 +746,14 @@ local function OnLoad(eventCode, name)
 			default = true,
 			getFunc = function() return ImprovedTitleizer.savedVariables.sortbyachievecat end,
 			setFunc = function( newValue ) ImprovedTitleizer.savedVariables.sortbyachievecat = newValue; ConstructTitleMenu() end,
+      warning = "Will need to reload the UI.",	--(optional)
+		},
+		{
+			type    = "checkbox",
+			name    = "Show missing titles",
+			default = true,
+			getFunc = function() return ImprovedTitleizer.savedVariables.showmissingtitles end,
+			setFunc = function( newValue ) ImprovedTitleizer.savedVariables.showmissingtitles = newValue; ConstructTitleMenu() end,
       warning = "Will need to reload the UI.",	--(optional)
 		},
 	}

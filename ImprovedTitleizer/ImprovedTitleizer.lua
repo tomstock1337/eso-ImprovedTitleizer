@@ -7,7 +7,7 @@ local ImprovedTitleizer = {}
 ImprovedTitleizer.Name = "ImprovedTitleizer"
 ImprovedTitleizer.DisplayName = "Improved Titleizer"
 ImprovedTitleizer.Author = "tomstock, IsJustaGhost, Baertram[, Kyoma]"
-ImprovedTitleizer.Version = "1.9"
+ImprovedTitleizer.Version = "1.91"
 ImprovedTitleizer.DefSortByAchieveCat = true
 ImprovedTitleizer.DefShowMissingTitles = false
 
@@ -746,7 +746,8 @@ local function OnLoad(eventCode, name)
 			default = true,
 			getFunc = function() return ImprovedTitleizer.savedVariables.sortbyachievecat end,
 			setFunc = function( newValue ) ImprovedTitleizer.savedVariables.sortbyachievecat = newValue; ConstructTitleMenu() end,
-      warning = "Will need to reload the UI.",	--(optional)
+        		warning = "Will need to reload the UI.",	--(optional)
+			requiresReload = true,
 		},
 		{
 			type    = "checkbox",
@@ -754,7 +755,8 @@ local function OnLoad(eventCode, name)
 			default = true,
 			getFunc = function() return ImprovedTitleizer.savedVariables.showmissingtitles end,
 			setFunc = function( newValue ) ImprovedTitleizer.savedVariables.showmissingtitles = newValue; ConstructTitleMenu() end,
-      warning = "Will need to reload the UI.",	--(optional)
+      			warning = "Will need to reload the UI.",	--(optional)
+			requiresReload = true,
 		},
 	}
 	LAM = LibAddonMenu2

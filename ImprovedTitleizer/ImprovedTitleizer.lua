@@ -481,6 +481,10 @@ end
 --]]
 local function ConstructTitleMenu()
 
+  local doDebug = ImprovedTitleizer.Debug
+  local showmissingtitles = ImprovedTitleizer.savedVariables.showmissingtitles
+
+
   TitleMenu = {}
   TitleCategories ={}
   local subMenus={}
@@ -495,12 +499,13 @@ local function ConstructTitleMenu()
     local catTitle =vTitle.CategoryName
     local toolTip = GetString(SI_GAMEPAD_ACHIEVEMENTS_CHARACTER_PERSISTENT)..":\n"..vTitle.AchievementName
 
-    if(not vTitle.HasTitle and (ImprovedTitleizer.Debug or ImprovedTitleizer.savedVariables.showmissingtitles)) then
-      isEnabled = false;
+    if(not vTitle.HasTitle and (doDebug or showmissingtitles)) then
+      toolTip = GetString(SI_INPUT_LANGUAGE_UNKNOWN) .. "\n" .. toolTip
+      isEnabled = true; --enable it to show tooltip
     else isEnabled = true;
     end;
 
-    if ImprovedTitleizer.Debug then
+    if doDebug then
       catTitle=catTitle.." #"..vTitle.CategoryID
       title = title.."  #"..vTitle.TitleID.."  HasTitle:".. tostring(vTitle.HasTitle).."  CategoryID:"..tostring(vTitle.CategoryID)
     end
@@ -513,15 +518,16 @@ local function ConstructTitleMenu()
           end
           if(titlePlaced==false) then
             titlePlaced=true
-            if (vTitle.HasTitle or ImprovedTitleizer.Debug or ImprovedTitleizer.savedVariables.showmissingtitles) then
+            local hasTitle = vTitle.HasTitle
+            if (hasTitle or doDebug or showmissingtitles) then
               local newEntry = {
-                name=title,
+                name=(hasTitle and title) or ((doDebug or showmissingtitles) and "|cFF0000" .. title .. "|r"),
                 categoryId=vTitle.CategoryID,
                 isHeader=false,
                 rank=q.Rank or 0,
                 icon = q.Icon,
                 enabled = function() return isEnabled end,
-                callback=function() SelectTitle(vTitle.TitleID) end,
+                callback= (hasTitle and function() SelectTitle(vTitle.TitleID) end) or function() end,
                 tooltip=toolTip,
                 isNew = newTitles[vTitle.Title] or nil
               }
@@ -685,10 +691,10 @@ local function OnLoad(eventCode, name)
     AllTitles=ImprovedTitleizer.savedVariables.titleDetails
   end
   if ImprovedTitleizer.savedVariables.sortbyachievecat == nil then
-    ImprovedTitleizer.savedVariables.sortbyachievecat = DefSortByAchieveCat
+    ImprovedTitleizer.savedVariables.sortbyachievecat = ImprovedTitleizer.DefSortByAchieveCat
   end
   if ImprovedTitleizer.savedVariables.showmissingtitles == nil then
-    ImprovedTitleizer.savedVariables.showmissingtitles = DefShowMissingTitles
+    ImprovedTitleizer.savedVariables.showmissingtitles = ImprovedTitleizer.DefShowMissingTitles
   end
 
   ImprovedTitleizer.savedVariables.lastversion = ImprovedTitleizer.Version
@@ -746,8 +752,9 @@ local function OnLoad(eventCode, name)
 			default = true,
 			getFunc = function() return ImprovedTitleizer.savedVariables.sortbyachievecat end,
 			setFunc = function( newValue ) ImprovedTitleizer.savedVariables.sortbyachievecat = newValue; ConstructTitleMenu() end,
-        		warning = "Will need to reload the UI.",	--(optional)
-			requiresReload = true,
+            warning = "Will need to reload the UI.",	--(optional)
+            requiresReload = true,
+            default = ImprovedTitleizer.DefSortByAchieveCat,
 		},
 		{
 			type    = "checkbox",
@@ -755,8 +762,9 @@ local function OnLoad(eventCode, name)
 			default = true,
 			getFunc = function() return ImprovedTitleizer.savedVariables.showmissingtitles end,
 			setFunc = function( newValue ) ImprovedTitleizer.savedVariables.showmissingtitles = newValue; ConstructTitleMenu() end,
-      			warning = "Will need to reload the UI.",	--(optional)
-			requiresReload = true,
+            warning = "Will need to reload the UI.",	--(optional)
+            requiresReload = true,
+            default = ImprovedTitleizer.DefShowMissingTitles,
 		},
 	}
 	LAM = LibAddonMenu2

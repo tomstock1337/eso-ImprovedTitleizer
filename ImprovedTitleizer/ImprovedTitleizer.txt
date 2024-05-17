@@ -11,6 +11,6 @@
 ## APIVersion: 101041 101042
 ## SavedVariables: ImprovedTitleizerSavedVariables
 ## OptionalDependsOn: LibDebugLogger>=263
-## DependsOn: LibAddonMenu-2.0>=36 LibScrollableMenu>=0200 
+## DependsOn: LibAddonMenu-2.0>=36 LibScrollableMenu>=0201
 
 ImprovedTitleizer.lua

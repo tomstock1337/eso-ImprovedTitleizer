@@ -7,7 +7,7 @@ local ImprovedTitleizer = {}
 ImprovedTitleizer.Name = "ImprovedTitleizer"
 ImprovedTitleizer.DisplayName = "Improved Titleizer"
 ImprovedTitleizer.Author = "tomstock, IsJustaGhost, Baertram[, Kyoma]"
-ImprovedTitleizer.Version = "1.92"
+ImprovedTitleizer.Version = "1.9.3"
 ImprovedTitleizer.DefSortByAchieveCat = true
 ImprovedTitleizer.DefShowMissingTitles = false
 
@@ -496,6 +496,7 @@ local function ConstructTitleMenu()
     local titlePlaced = false
     local isEnabled = true
     local title = vTitle.Title
+    local hasTitle = vTitle.HasTitle
     local catTitle =vTitle.CategoryName
     local toolTip = GetString(SI_GAMEPAD_ACHIEVEMENTS_CHARACTER_PERSISTENT)..":\n"..vTitle.AchievementName
 
@@ -518,16 +519,16 @@ local function ConstructTitleMenu()
           end
           if(titlePlaced==false) then
             titlePlaced=true
-            local hasTitle = vTitle.HasTitle
             if (hasTitle or doDebug or showmissingtitles) then
               local newEntry = {
+                sortName = title,
                 name=(hasTitle and title) or ((doDebug or showmissingtitles) and "|cFF0000" .. title .. "|r"),
                 categoryId=vTitle.CategoryID,
                 isHeader=false,
                 rank=q.Rank or 0,
                 icon = q.Icon,
                 enabled = function() return isEnabled end,
-                callback= (hasTitle and function() SelectTitle(vTitle.TitleID) end) or function() end,
+                callback= (hasTitle and function() SelectTitle(vTitle.TitleID) end) or nil,
                 tooltip=toolTip,
                 isNew = newTitles[vTitle.Title] or nil
               }
@@ -544,7 +545,7 @@ local function ConstructTitleMenu()
         end
       end
     end
-    if titlePlaced == false then
+    if titlePlaced == false and (hasTitle or doDebug or showmissingtitles) then
       if TitleCategories[vTitle.CategoryName]==nil then
         TitleCategories[vTitle.CategoryName] ={
           name=catTitle,
@@ -552,7 +553,16 @@ local function ConstructTitleMenu()
           isHeader=true,
         }
       end
-      table.insert(TitleMenu,{name=title,categoryId=vTitle.CategoryID,isHeader=false, rank = 0, callback=function() SelectTitle(vTitle.TitleID) end,tooltip=toolTip,enabled = function() return isEnabled end})
+      table.insert(
+        TitleMenu,
+        {
+          sortName = title,
+          name=(hasTitle and title) or ((doDebug or showmissingtitles) and "|cFF0000" .. title .. "|r"),
+          categoryId=vTitle.CategoryID,
+          isHeader=false, rank = 0,
+          callback=(hasTitle and function() SelectTitle(vTitle.TitleID) end) or nil,
+          tooltip=toolTip,enabled = function() return isEnabled end
+        })
     end
   end
 
@@ -571,9 +581,9 @@ local function ConstructTitleMenu()
 
   --sort uncategorized titles
   if ImprovedTitleizer.savedVariables.sortbyachievecat then
-    table.sort(TitleMenu, function(item1, item2) return ZO_TableOrderingFunction(item1, item2, "categoryId",{["categoryId"]={tiebreaker = "isHeader",isNumeric=true,tieBreakerSortOrder=ZO_SORT_ORDER_DOWN},["isHeader"]={tiebreaker = "name",tieBreakerSortOrder = ZO_SORT_ORDER_UP},["name"]={caseInsensitive=true}}, ZO_SORT_ORDER_UP) end)
+    table.sort(TitleMenu, function(item1, item2) return ZO_TableOrderingFunction(item1, item2, "categoryId",{["categoryId"]={tiebreaker = "isHeader",isNumeric=true,tieBreakerSortOrder=ZO_SORT_ORDER_DOWN},["isHeader"]={tiebreaker = "sortName",tieBreakerSortOrder = ZO_SORT_ORDER_UP},["sortName"]={caseInsensitive=true}}, ZO_SORT_ORDER_UP) end)
   else
-    table.sort(TitleMenu, function(item1, item2) return ZO_TableOrderingFunction(item1, item2, "name",{["name"]={caseInsensitive=true}}, ZO_SORT_ORDER_UP) end)
+    table.sort(TitleMenu, function(item1, item2) return ZO_TableOrderingFunction(item1, item2, "sortName",{["sortName"]={caseInsensitive=true}}, ZO_SORT_ORDER_UP) end)
   end
 
   --sort sub-categories
@@ -586,9 +596,9 @@ local function ConstructTitleMenu()
         table.sort(titles.Entries, function(item1, item2) return ZO_TableOrderingFunction(item1, item2, "isHeader", {["isHeader"]={tiebreaker = "rank",tieBreakerSortOrder=ZO_SORT_ORDER_UP},["rank"] = {isNumeric = true}} , ZO_SORT_ORDER_DOWN) end)
       else
         if ImprovedTitleizer.savedVariables.sortbyachievecat then
-          table.sort(titles.Entries, function(item1, item2) return ZO_TableOrderingFunction(item1, item2, "categoryId",{["categoryId"]={tiebreaker = "isHeader",isNumeric=true,tieBreakerSortOrder=ZO_SORT_ORDER_DOWN},["isHeader"]={tiebreaker = "name",tieBreakerSortOrder = ZO_SORT_ORDER_UP},["name"]={caseInsensitive=true}}, ZO_SORT_ORDER_UP) end)
+          table.sort(titles.Entries, function(item1, item2) return ZO_TableOrderingFunction(item1, item2, "categoryId",{["categoryId"]={tiebreaker = "isHeader",isNumeric=true,tieBreakerSortOrder=ZO_SORT_ORDER_DOWN},["isHeader"]={tiebreaker = "sortName",tieBreakerSortOrder = ZO_SORT_ORDER_UP},["sortName"]={caseInsensitive=true}}, ZO_SORT_ORDER_UP) end)
         else
-          table.sort(titles.Entries, function(item1, item2) return ZO_TableOrderingFunction(item1, item2, "name",{["name"]={caseInsensitive=true}}, ZO_SORT_ORDER_UP) end)
+          table.sort(titles.Entries, function(item1, item2) return ZO_TableOrderingFunction(item1, item2, "sortName",{["sortName"]={caseInsensitive=true}}, ZO_SORT_ORDER_UP) end)
         end
       end
       table.insert(TitleMenu, i, {name=header, entries=titles.Entries, isNew = titles.hasNew})

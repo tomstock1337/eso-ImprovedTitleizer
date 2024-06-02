@@ -7,7 +7,7 @@ local ImprovedTitleizer = {}
 ImprovedTitleizer.Name = "ImprovedTitleizer"
 ImprovedTitleizer.DisplayName = "Improved Titleizer"
 ImprovedTitleizer.Author = "tomstock, IsJustaGhost, Baertram[, Kyoma]"
-ImprovedTitleizer.Version = "1.9.3"
+ImprovedTitleizer.Version = "1.9.4"
 ImprovedTitleizer.DefSortByAchieveCat = true
 ImprovedTitleizer.DefShowMissingTitles = false
 
@@ -713,7 +713,7 @@ local function OnLoad(eventCode, name)
   SetupTitleEventManagement()
 
   --LibScrollableMenu
-  LSM:RegisterCallback('NewStatusUpdated', function(data, entry)
+  LSM:RegisterCallback('NewStatusUpdated', function(entry, data)
       -- This callback is fired on mouse-over of entries that were flagged as new.
       if newTitles[data.name] then
           newTitles[data.name] = nil

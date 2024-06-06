@@ -7,7 +7,7 @@ local ImprovedTitleizer = {}
 ImprovedTitleizer.Name = "ImprovedTitleizer"
 ImprovedTitleizer.DisplayName = "Improved Titleizer"
 ImprovedTitleizer.Author = "tomstock, IsJustaGhost, Baertram[, Kyoma]"
-ImprovedTitleizer.Version = "1.9.4"
+ImprovedTitleizer.Version = "1.9.5"
 ImprovedTitleizer.DefSortByAchieveCat = true
 ImprovedTitleizer.DefShowMissingTitles = false
 
@@ -777,7 +777,7 @@ local function OnLoad(eventCode, name)
             default = ImprovedTitleizer.DefShowMissingTitles,
 		},
 	}
-	LAM = LibAddonMenu2
+	local LAM = LibAddonMenu2
 	LAM:RegisterAddonPanel(ImprovedTitleizer.Name .. "Options", menuOptions )
 	LAM:RegisterOptionControls(ImprovedTitleizer.Name .. "Options", dataTable )
 

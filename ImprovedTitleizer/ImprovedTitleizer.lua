@@ -7,11 +7,16 @@ local ImprovedTitleizer = {}
 ImprovedTitleizer.Name = "ImprovedTitleizer"
 ImprovedTitleizer.DisplayName = "Improved Titleizer"
 ImprovedTitleizer.Author = "tomstock, IsJustaGhost, Baertram[, Kyoma]"
-ImprovedTitleizer.Version = "1.9.5"
+ImprovedTitleizer.Version = "1.10"
 ImprovedTitleizer.DefSortByAchieveCat = true
 ImprovedTitleizer.DefShowMissingTitles = false
 
 ImprovedTitleizer.Debug = false --Todo: Change that to false before setting live, or else tooltips will contain an extra ID row at the end
+
+ImprovedTitleizer.defaultSetting = {
+  sortbyachievecat = true,
+  showmissingtitles = false,
+}
 
 local LSM = LibScrollableMenu
 
@@ -436,7 +441,7 @@ local function InitializeTitles()
         end
         local name, description, points, icon, completed, date, time = GetAchievementInfo(id)
         -- Just used to test the new icon in LibScrollableMenu
-        --	if newTitles[name] == nil then newTitles[name] = true end
+        --  if newTitles[name] == nil then newTitles[name] = true end
         local playerHasTitle = false
         local playerTitleIndex = -1
         for j=1,GetNumTitles() do
@@ -682,7 +687,7 @@ local function OnLoad(eventCode, name)
   if name ~= ImprovedTitleizer.Name then return end
   EVENT_MANAGER:UnregisterForEvent(ImprovedTitleizer.Name, EVENT_ADD_ON_LOADED)
 
-  ImprovedTitleizer.savedVariables = ZO_SavedVars:NewAccountWide("ImprovedTitleizerSavedVariables", 1, nil, {}) --Instead of nil you can also use GetWorldName() to save the SV server dependent
+  ImprovedTitleizer.savedVariables = ZO_SavedVars:NewAccountWide("ImprovedTitleizerSavedVariables", 1, nil, ImprovedTitleizer.defaultSetting) --Instead of nil you can also use GetWorldName() to save the SV server dependent
 
   if ImprovedTitleizer.savedVariables.lastversion == nil or ImprovedTitleizer.savedVariables.lastversion ~= ImprovedTitleizer.Version then
     if ImprovedTitleizer.logger ~= nil then ImprovedTitleizer.logger:Info("New version of addon installed, recreating.") end
@@ -699,12 +704,6 @@ local function OnLoad(eventCode, name)
   else
     if ImprovedTitleizer.logger ~= nil then ImprovedTitleizer.logger:Info("Loading titles from saved variables.") end
     AllTitles=ImprovedTitleizer.savedVariables.titleDetails
-  end
-  if ImprovedTitleizer.savedVariables.sortbyachievecat == nil then
-    ImprovedTitleizer.savedVariables.sortbyachievecat = ImprovedTitleizer.DefSortByAchieveCat
-  end
-  if ImprovedTitleizer.savedVariables.showmissingtitles == nil then
-    ImprovedTitleizer.savedVariables.showmissingtitles = ImprovedTitleizer.DefShowMissingTitles
   end
 
   ImprovedTitleizer.savedVariables.lastversion = ImprovedTitleizer.Version
@@ -738,48 +737,44 @@ local function OnLoad(eventCode, name)
 
   EVENT_MANAGER:RegisterForEvent(ImprovedTitleizer.Name, EVENT_ACHIEVEMENT_AWARDED, OnAchievementsAwarded)
 
-	local menuOptions = {
-		type				 = "panel",
-		name				 = ImprovedTitleizer.Name,
-		displayName	 = ImprovedTitleizer.DisplayName,
-		author			 = ImprovedTitleizer.Author,
-		version			 = ImprovedTitleizer.Version,
-		registerForRefresh	= true,
-		registerForDefaults = true,
-	}
+  local menuOptions = {
+    type         = "panel",
+    name         = ImprovedTitleizer.Name,
+    displayName   = ImprovedTitleizer.DisplayName,
+    author       = ImprovedTitleizer.Author,
+    version       = ImprovedTitleizer.Version,
+    registerForRefresh  = true,
+    registerForDefaults = true,
+  }
 
-	local dataTable = {
-		{
-			type = "description",
-			text = "Sorts titles in the Character title dropdown.",
-		},
-		{
-			type = "divider",
-		},
-		{
-			type    = "checkbox",
-			name    = "Sort by Achievement Category",
-			default = true,
-			getFunc = function() return ImprovedTitleizer.savedVariables.sortbyachievecat end,
-			setFunc = function( newValue ) ImprovedTitleizer.savedVariables.sortbyachievecat = newValue; ConstructTitleMenu() end,
-            warning = "Will need to reload the UI.",	--(optional)
-            requiresReload = true,
-            default = ImprovedTitleizer.DefSortByAchieveCat,
-		},
-		{
-			type    = "checkbox",
-			name    = "Show missing titles",
-			default = true,
-			getFunc = function() return ImprovedTitleizer.savedVariables.showmissingtitles end,
-			setFunc = function( newValue ) ImprovedTitleizer.savedVariables.showmissingtitles = newValue; ConstructTitleMenu() end,
-            warning = "Will need to reload the UI.",	--(optional)
-            requiresReload = true,
-            default = ImprovedTitleizer.DefShowMissingTitles,
-		},
-	}
-	local LAM = LibAddonMenu2
-	LAM:RegisterAddonPanel(ImprovedTitleizer.Name .. "Options", menuOptions )
-	LAM:RegisterOptionControls(ImprovedTitleizer.Name .. "Options", dataTable )
+  local dataTable = {
+    {
+      type = "description",
+      text = "Sorts titles in the Character title dropdown.",
+    },
+    {
+      type = "divider",
+    },
+    {
+      type    = "checkbox",
+      name    = "Sort by Achievement Category",
+      getFunc = function() return ImprovedTitleizer.savedVariables.sortbyachievecat end,
+      setFunc = function( newValue ) ImprovedTitleizer.savedVariables.sortbyachievecat = newValue; ConstructTitleMenu() end,
+      warning = "Will need to reload the UI.",  --(optional)
+      requiresReload = true,
+    },
+    {
+      type    = "checkbox",
+      name    = "Show missing titles",
+      getFunc = function() return ImprovedTitleizer.savedVariables.showmissingtitles end,
+      setFunc = function( newValue ) ImprovedTitleizer.savedVariables.showmissingtitles = newValue; ConstructTitleMenu() end,
+      warning = "Will need to reload the UI.",  --(optional)
+      requiresReload = true,
+    },
+  }
+  local LAM = LibAddonMenu2
+  LAM:RegisterAddonPanel(ImprovedTitleizer.Name .. "Options", menuOptions )
+  LAM:RegisterOptionControls(ImprovedTitleizer.Name .. "Options", dataTable )
 
 end
 

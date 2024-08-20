@@ -23,3 +23,7 @@ if (Test-Path $pathAddons\$addonName) {
   echo "Creating Softlink"
   New-Item -ItemType SymbolicLink -Path $pathAddons -Name $addonName -Value "$develFolder\$addonName"
 }
+if ((Test-Path "$pathAddons\..\SavedVariables\$addonName.lua") -And (-Not (Test-Path "$develFolder\${addonName}_sv.lua"))) {
+  echo "Creating Saved Variables Softlink"
+  New-Item -ItemType SymbolicLink -Path "$develFolder" -Name "${addonName}_sv.lua" -Value "$pathAddons\..\SavedVariables\$addonName.lua"
+}

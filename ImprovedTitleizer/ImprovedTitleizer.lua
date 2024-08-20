@@ -7,7 +7,7 @@ local ImprovedTitleizer = {}
 ImprovedTitleizer.Name = "ImprovedTitleizer"
 ImprovedTitleizer.DisplayName = "Improved Titleizer"
 ImprovedTitleizer.Author = "tomstock, IsJustaGhost, Baertram[, Kyoma]"
-ImprovedTitleizer.Version = "1.10"
+ImprovedTitleizer.Version = "1.11"
 ImprovedTitleizer.DefSortByAchieveCat = true
 ImprovedTitleizer.DefShowMissingTitles = false
 

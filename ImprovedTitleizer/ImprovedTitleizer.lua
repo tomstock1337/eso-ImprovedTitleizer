@@ -3,22 +3,29 @@
   Addon header information
   ==============================================
 --]]
-local ImprovedTitleizer = {}
+ImprovedTitleizer = {}
+local ImprovedTitleizer = ImprovedTitleizer
+
 ImprovedTitleizer.Name = "ImprovedTitleizer"
 ImprovedTitleizer.DisplayName = "Improved Titleizer"
-ImprovedTitleizer.Author = "tomstock, IsJustaGhost, Baertram[, Kyoma]"
-ImprovedTitleizer.Version = "1.11"
-ImprovedTitleizer.DefSortByAchieveCat = true
-ImprovedTitleizer.DefShowMissingTitles = false
+ImprovedTitleizer.Author = "tomstock, Baertram, IsJustaGhost[, Kyoma]"
+ImprovedTitleizer.Version = "1.9.6"
 
 ImprovedTitleizer.Debug = false --Todo: Change that to false before setting live, or else tooltips will contain an extra ID row at the end
+ImprovedTitleizer.titleDropdownRow = nil
 
-ImprovedTitleizer.defaultSetting = {
-  sortbyachievecat = true,
-  showmissingtitles = false,
-}
+local tins = table.insert
+local tsort = table.sort
+local tgetn = table.getn
 
 local LSM = LibScrollableMenu
+
+local defaultSVs = {
+  sortbyachievecat = true,
+  showmissingtitles = false,
+  visibleRowsDropdown = 16,
+  visibleRowsSubmenu = 16,
+}
 
 ImprovedTitleizer.logger = nil
 --[[
@@ -45,9 +52,9 @@ local function spairs(t, order)
     -- if order function given, sort by it by passing the table and keys a, b,
     -- otherwise just sort the keys
     if order then
-        table.sort(keys, function(a,b) return order(t, a, b) end)
+        tsort(keys, function(a,b) return order(t, a, b) end)
     else
-        table.sort(keys)
+        tsort(keys)
     end
 
     -- return the iterator function
@@ -379,6 +386,10 @@ local AllTitles={}
 --{TitleID=id, CategoryID=categoryId, CategoryName=categoryName,SubCategoryID=subCategory,SubCategoryName=subCategoryName,HasTitle=hasTitle}
 
 local TitleMenu = {}
+local TitleCategories = {}
+ImprovedTitleizer.TitleMenu = TitleMenu
+ImprovedTitleizer.TitleCategories = TitleCategories
+
 
 local GetNumAchievementCategories        = GetNumAchievementCategories
 --Usage: local numAchieveCategory = GetNumAchievementCategories()
@@ -441,7 +452,7 @@ local function InitializeTitles()
         end
         local name, description, points, icon, completed, date, time = GetAchievementInfo(id)
         -- Just used to test the new icon in LibScrollableMenu
-        --  if newTitles[name] == nil then newTitles[name] = true end
+        --	if newTitles[name] == nil then newTitles[name] = true end
         local playerHasTitle = false
         local playerTitleIndex = -1
         for j=1,GetNumTitles() do
@@ -451,7 +462,7 @@ local function InitializeTitles()
             break
           end
         end
-        table.insert(AllTitles,1,{AchievementID=id,TitleID=playerTitleIndex,Title=title,CategoryID=categoryId, CategoryName=categoryName,SubCategoryID=subCategory,SubCategoryName=subCategoryName,HasTitle=playerHasTitle,AchievementName=achieveName,AchievementDescription=description},1);
+        tins(AllTitles,1,{AchievementID=id,TitleID=playerTitleIndex,Title=title,CategoryID=categoryId, CategoryName=categoryName,SubCategoryID=subCategory,SubCategoryName=subCategoryName,HasTitle=playerHasTitle,AchievementName=achieveName,AchievementDescription=description},1);
       end
       id = GetNextAchievementInLine(id)
     end
@@ -485,14 +496,17 @@ end
   ==============================================
 --]]
 local function ConstructTitleMenu()
+--d("[ImprovedTitleizer]ConstructTitleMenu")
 
   local doDebug = ImprovedTitleizer.Debug
   local showmissingtitles = ImprovedTitleizer.savedVariables.showmissingtitles
-
+  local sv = ImprovedTitleizer.savedVariables
+  local sortByAchievementCategory = sv.sortbyachievecat
 
   TitleMenu = {}
   TitleCategories ={}
   local subMenus={}
+
   for i,sub in pairs(AchievmentIdsCategories) do
     subMenus[sub.Name]={Entries={},Categories={}}
   end
@@ -537,7 +551,7 @@ local function ConstructTitleMenu()
                 tooltip=toolTip,
                 isNew = newTitles[vTitle.Title] or nil
               }
-              table.insert(subMenus[vCategory.Name].Entries, newEntry)
+              tins(subMenus[vCategory.Name].Entries, newEntry)
               if(subMenus[vCategory.Name].Categories[vTitle.CategoryName]==nil) then
                 subMenus[vCategory.Name].Categories[vTitle.CategoryName] ={
                   name=catTitle,
@@ -558,7 +572,7 @@ local function ConstructTitleMenu()
           isHeader=true,
         }
       end
-      table.insert(
+      tins(
         TitleMenu,
         {
           sortName = title,
@@ -572,91 +586,132 @@ local function ConstructTitleMenu()
   end
 
   --add headers
-  if ImprovedTitleizer.savedVariables.sortbyachievecat then
+  if sortByAchievementCategory then
     for header, menu in spairs(subMenus) do
       for _, cat in pairs(menu.Categories) do
-        table.insert(menu.Entries, cat)
+        tins(menu.Entries, cat)
       end
     end
 
     for _, cat in pairs(TitleCategories) do
-      table.insert(TitleMenu, cat)
+      tins(TitleMenu, cat)
     end
   end
 
   --sort uncategorized titles
-  if ImprovedTitleizer.savedVariables.sortbyachievecat then
-    table.sort(TitleMenu, function(item1, item2) return ZO_TableOrderingFunction(item1, item2, "categoryId",{["categoryId"]={tiebreaker = "isHeader",isNumeric=true,tieBreakerSortOrder=ZO_SORT_ORDER_DOWN},["isHeader"]={tiebreaker = "sortName",tieBreakerSortOrder = ZO_SORT_ORDER_UP},["sortName"]={caseInsensitive=true}}, ZO_SORT_ORDER_UP) end)
+  if sortByAchievementCategory then
+    tsort(TitleMenu, function(item1, item2) return ZO_TableOrderingFunction(item1, item2, "categoryId",{["categoryId"]={tiebreaker = "isHeader",isNumeric=true,tieBreakerSortOrder=ZO_SORT_ORDER_DOWN},["isHeader"]={tiebreaker = "sortName",tieBreakerSortOrder = ZO_SORT_ORDER_UP},["sortName"]={caseInsensitive=true}}, ZO_SORT_ORDER_UP) end)
   else
-    table.sort(TitleMenu, function(item1, item2) return ZO_TableOrderingFunction(item1, item2, "sortName",{["sortName"]={caseInsensitive=true}}, ZO_SORT_ORDER_UP) end)
+    tsort(TitleMenu, function(item1, item2) return ZO_TableOrderingFunction(item1, item2, "sortName",{["sortName"]={caseInsensitive=true}}, ZO_SORT_ORDER_UP) end)
   end
 
   --sort sub-categories
   local i = 1
   for header, titles in spairs(subMenus) do
-    if(table.getn(titles.Entries) > 0) then
+    if(tgetn(titles.Entries) > 0) then
       if header==GetString(SI_AVA_MENU_ALLIANCE_WAR_GROUP) then --Alliance War
-        table.sort(titles.Entries, function(item1, item2) return ZO_TableOrderingFunction(item1, item2, "isHeader", {["isHeader"]={tiebreaker = "rank",tieBreakerSortOrder=ZO_SORT_ORDER_UP},["rank"] = {isNumeric = true}} , ZO_SORT_ORDER_DOWN) end)
+        tsort(titles.Entries, function(item1, item2) return ZO_TableOrderingFunction(item1, item2, "isHeader", {["isHeader"]={tiebreaker = "rank",tieBreakerSortOrder=ZO_SORT_ORDER_UP},["rank"] = {isNumeric = true}} , ZO_SORT_ORDER_DOWN) end)
       elseif header==GetString(SI_QUESTTYPE17) then  --Tribute
-        table.sort(titles.Entries, function(item1, item2) return ZO_TableOrderingFunction(item1, item2, "isHeader", {["isHeader"]={tiebreaker = "rank",tieBreakerSortOrder=ZO_SORT_ORDER_UP},["rank"] = {isNumeric = true}} , ZO_SORT_ORDER_DOWN) end)
+        tsort(titles.Entries, function(item1, item2) return ZO_TableOrderingFunction(item1, item2, "isHeader", {["isHeader"]={tiebreaker = "rank",tieBreakerSortOrder=ZO_SORT_ORDER_UP},["rank"] = {isNumeric = true}} , ZO_SORT_ORDER_DOWN) end)
       else
-        if ImprovedTitleizer.savedVariables.sortbyachievecat then
-          table.sort(titles.Entries, function(item1, item2) return ZO_TableOrderingFunction(item1, item2, "categoryId",{["categoryId"]={tiebreaker = "isHeader",isNumeric=true,tieBreakerSortOrder=ZO_SORT_ORDER_DOWN},["isHeader"]={tiebreaker = "sortName",tieBreakerSortOrder = ZO_SORT_ORDER_UP},["sortName"]={caseInsensitive=true}}, ZO_SORT_ORDER_UP) end)
+        if sortByAchievementCategory then
+          tsort(titles.Entries, function(item1, item2) return ZO_TableOrderingFunction(item1, item2, "categoryId",{["categoryId"]={tiebreaker = "isHeader",isNumeric=true,tieBreakerSortOrder=ZO_SORT_ORDER_DOWN},["isHeader"]={tiebreaker = "sortName",tieBreakerSortOrder = ZO_SORT_ORDER_UP},["sortName"]={caseInsensitive=true}}, ZO_SORT_ORDER_UP) end)
         else
-          table.sort(titles.Entries, function(item1, item2) return ZO_TableOrderingFunction(item1, item2, "sortName",{["sortName"]={caseInsensitive=true}}, ZO_SORT_ORDER_UP) end)
+          tsort(titles.Entries, function(item1, item2) return ZO_TableOrderingFunction(item1, item2, "sortName",{["sortName"]={caseInsensitive=true}}, ZO_SORT_ORDER_UP) end)
         end
       end
-      table.insert(TitleMenu, i, {name=header, entries=titles.Entries, isNew = titles.hasNew})
+      tins(TitleMenu, i, {name=header, entries=titles.Entries, isNew = titles.hasNew})
       i = i + 1
     end
   end
   -- add divider below "No Title" if there is more
   if #TitleMenu > 0 then
-    table.insert(TitleMenu, 1, {name=LSM.DIVIDER})
+    tins(TitleMenu, 1, {name=LSM.DIVIDER})
     i = i + 1
   end
   -- add divider below last submenu if there is more
   if i <= #TitleMenu then
-    table.insert(TitleMenu, i, {name=LSM.DIVIDER})
+    tins(TitleMenu, i, {name=LSM.DIVIDER})
   end
+
+  ImprovedTitleizer.TitleMenu = TitleMenu
+  ImprovedTitleizer.TitleCategories = TitleCategories
+  ImprovedTitleizer.TitleSubMenus = subMenus
 end
 --[[
   ==============================================
   Adjust the UI
   ==============================================
 --]]
-
 local wasAlreadyReplacingZO_StatsFuncs = false
+
+local function updateStatsTitleDropdownOptions()
+  if STATS.titleDropdownRow ~= nil then
+    local sv = ImprovedTitleizer.savedVariables
+    SetCustomScrollableMenuOptions(
+            {visibleRowsDropdown=sv.visibleRowsDropdown, visibleRowsSubmenu=sv.visibleRowsSubmenu, sortEntries=false},
+            STATS.titleDropdownRow.combobox
+    )
+  end
+end
+
+local origDropdownClearItems
+
+local function UpdateTitleDropdownTitles(self, dropdown)
+  --d("[ImprovedTitleizer]UpdateTitleDropdownTitles - dropdown: " ..tostring(dropdown))
+  if dropdown == nil then return end
+  if origDropdownClearItems == nil then
+    origDropdownClearItems = dropdown.ClearItems
+    dropdown.ClearItems = function(selfCtrl)
+--d("[ImprovedTitleizer]dropdown.ClearItems called - dropdown: " ..tostring(selfCtrl))
+      origDropdownClearItems(selfCtrl)
+    end
+  end
+
+  dropdown:ClearItems()
+  dropdown:AddItem(ZO_ComboBox:CreateItemEntry(GetString(SI_STATS_NO_TITLE), function() SelectTitle(nil) end), ZO_COMBOBOX_SUPRESS_UPDATE)
+
+  ConstructTitleMenu()
+
+  dropdown:AddItems(TitleMenu)
+
+  self:UpdateTitleDropdownSelection(dropdown)
+end
+
+local updateTitleWasDone = false
+
 local function SetupTitleEventManagement()
   if wasAlreadyReplacingZO_StatsFuncs then return end
 
   local orgAddDropdownRow = STATS.AddDropdownRow
   STATS.AddDropdownRow = function(self, rowName)
+    local isTitleRow = (rowName == GetString(SI_STATS_TITLE) and true) or false
+    --d("[ImprovedTitleizer]STATS.AddDropdownRow - rowName: " ..tostring(rowName) .. ", isTitle: " ..tostring(isTitleRow))
+
     local control = orgAddDropdownRow(self, rowName)
     local comboBox = control:GetNamedChild("Dropdown")
     control.combobox = comboBox
-    --control.scrollHelper = LSM.ScrollableDropdownHelper:New(self.control, control, 16) --use the API function instead
-    --Prevent duplicate LibScrollableMenu init
-    if control.scrollHelper == nil then
-      control.scrollHelper = AddCustomScrollableComboBoxDropdownMenu(self.control, comboBox, {visibleRowsDropdown=16, visibleRowsSubmenu=16, sortEntries=false})
+
+    --Are we creating the title dropdown box?
+    if isTitleRow == true then
+      local sv = ImprovedTitleizer.savedVariables
+
+      --control.scrollHelper = LSM.ScrollableDropdownHelper:New(self.control, control, 16) --use the API function instead
+      --Prevent duplicate LibScrollableMenu init
+      if control.scrollHelper == nil then
+        control.scrollHelper = AddCustomScrollableComboBoxDropdownMenu(
+                self.control, --STATS.titleDropdownRow
+                comboBox,
+                {visibleRowsDropdown=sv.visibleRowsDropdown, visibleRowsSubmenu=sv.visibleRowsSubmenu, sortEntries=false}
+        )
+      end
+      control.scrollHelper.OnShow = function() end --don't change parenting
+
+      ImprovedTitleizer.titleDropdownRow = control
+      updateTitleWasDone = true
     end
 
-    --STATS_SCENE:RegisterCallback("StateChange", OnStateChange) --Beartram: global or local function OnStateChange does not exist?
-    control.scrollHelper.OnShow = function() end --don't change parenting
-
-    --local titlesRow = control --Beartram: no used anywhere
     return control
-  end
-
-  local function UpdateTitleDropdownTitles(self, dropdown)
-    dropdown:ClearItems()
-    dropdown:AddItem(ZO_ComboBox:CreateItemEntry(GetString(SI_STATS_NO_TITLE), function() SelectTitle(nil) end), ZO_COMBOBOX_SUPRESS_UPDATE)
-
-    ConstructTitleMenu()
-
-    dropdown:AddItems(TitleMenu)
-
-    self:UpdateTitleDropdownSelection(dropdown)
   end
 
   -- Old function from before 8.2.5
@@ -671,12 +726,21 @@ local function SetupTitleEventManagement()
   end
 
   if STATS and STATS.UpdateTitleDropdownTitles then
+--d("[ImprovedTitleizer]STATS.UpdateTitleDropdownTitles hooked")
     STATS.UpdateTitleDropdownTitles = UpdateTitleDropdownTitles
     STATS.UpdateTitleDropdownSelection = UpdateTitleDropdownSelection
   end
 
+  SecurePostHook(STATS, "OnShowing", function()
+    local isInitialized = STATS.initialized
+--d("[ImprovedTitleizer]STATS.OnShowing - initialized: " .. tostring(isInitialized))
+    if isInitialized and updateTitleWasDone and ImprovedTitleizer.titleDropdownRow ~= nil then
+      STATS:UpdateTitleDropdownTitles(ImprovedTitleizer.titleDropdownRow.dropdown)
+    end
+  end)
   wasAlreadyReplacingZO_StatsFuncs = true
 end
+
 --[[
   ==============================================
   Plugin Initialization - cache titles where possible, recreate when necessary
@@ -687,7 +751,7 @@ local function OnLoad(eventCode, name)
   if name ~= ImprovedTitleizer.Name then return end
   EVENT_MANAGER:UnregisterForEvent(ImprovedTitleizer.Name, EVENT_ADD_ON_LOADED)
 
-  ImprovedTitleizer.savedVariables = ZO_SavedVars:NewAccountWide("ImprovedTitleizerSavedVariables", 1, nil, ImprovedTitleizer.defaultSetting) --Instead of nil you can also use GetWorldName() to save the SV server dependent
+  ImprovedTitleizer.savedVariables = ZO_SavedVars:NewAccountWide("ImprovedTitleizerSavedVariables", 1, GetWorldName(), defaultSVs)
 
   if ImprovedTitleizer.savedVariables.lastversion == nil or ImprovedTitleizer.savedVariables.lastversion ~= ImprovedTitleizer.Version then
     if ImprovedTitleizer.logger ~= nil then ImprovedTitleizer.logger:Info("New version of addon installed, recreating.") end
@@ -704,6 +768,12 @@ local function OnLoad(eventCode, name)
   else
     if ImprovedTitleizer.logger ~= nil then ImprovedTitleizer.logger:Info("Loading titles from saved variables.") end
     AllTitles=ImprovedTitleizer.savedVariables.titleDetails
+  end
+  if ImprovedTitleizer.savedVariables.sortbyachievecat == nil then
+    ImprovedTitleizer.savedVariables.sortbyachievecat = defaultSVs.sortbyachievecat
+  end
+  if ImprovedTitleizer.savedVariables.showmissingtitles == nil then
+    ImprovedTitleizer.savedVariables.showmissingtitles = defaultSVs.showmissingtitles
   end
 
   ImprovedTitleizer.savedVariables.lastversion = ImprovedTitleizer.Version
@@ -737,44 +807,74 @@ local function OnLoad(eventCode, name)
 
   EVENT_MANAGER:RegisterForEvent(ImprovedTitleizer.Name, EVENT_ACHIEVEMENT_AWARDED, OnAchievementsAwarded)
 
-  local menuOptions = {
-    type         = "panel",
-    name         = ImprovedTitleizer.Name,
-    displayName   = ImprovedTitleizer.DisplayName,
-    author       = ImprovedTitleizer.Author,
-    version       = ImprovedTitleizer.Version,
-    registerForRefresh  = true,
-    registerForDefaults = true,
-  }
+	local menuOptions = {
+		type				 = "panel",
+		name				 = ImprovedTitleizer.Name,
+		displayName	 = ImprovedTitleizer.DisplayName,
+		author			 = ImprovedTitleizer.Author,
+		version			 = ImprovedTitleizer.Version,
+		registerForRefresh	= true,
+		registerForDefaults = true,
+	}
 
-  local dataTable = {
-    {
-      type = "description",
-      text = "Sorts titles in the Character title dropdown.",
-    },
-    {
-      type = "divider",
-    },
-    {
-      type    = "checkbox",
-      name    = "Sort by Achievement Category",
-      getFunc = function() return ImprovedTitleizer.savedVariables.sortbyachievecat end,
-      setFunc = function( newValue ) ImprovedTitleizer.savedVariables.sortbyachievecat = newValue; ConstructTitleMenu() end,
-      warning = "Will need to reload the UI.",  --(optional)
-      requiresReload = true,
-    },
-    {
-      type    = "checkbox",
-      name    = "Show missing titles",
-      getFunc = function() return ImprovedTitleizer.savedVariables.showmissingtitles end,
-      setFunc = function( newValue ) ImprovedTitleizer.savedVariables.showmissingtitles = newValue; ConstructTitleMenu() end,
-      warning = "Will need to reload the UI.",  --(optional)
-      requiresReload = true,
-    },
-  }
-  local LAM = LibAddonMenu2
-  LAM:RegisterAddonPanel(ImprovedTitleizer.Name .. "Options", menuOptions )
-  LAM:RegisterOptionControls(ImprovedTitleizer.Name .. "Options", dataTable )
+	local dataTable = {
+		{
+			type = "description",
+			text = "Sorts titles in the Character title dropdown.",
+		},
+		{
+			type = "divider",
+		},
+		{
+			type    = "checkbox",
+			name    = "Sort by Achievement Category",
+			default = true,
+			getFunc = function() return ImprovedTitleizer.savedVariables.sortbyachievecat end,
+			setFunc = function( newValue ) ImprovedTitleizer.savedVariables.sortbyachievecat = newValue; ConstructTitleMenu() end,
+            warning = "Sorts the achievements by it'S category and not by name",	--(optional)
+            requiresReload = true,
+            default = defaultSVs.sortbyachievecat,
+		},
+		{
+			type    = "checkbox",
+			name    = "Show missing titles",
+			default = true,
+			getFunc = function() return ImprovedTitleizer.savedVariables.showmissingtitles end,
+			setFunc = function( newValue ) ImprovedTitleizer.savedVariables.showmissingtitles = newValue; ConstructTitleMenu() end,
+            warning = "Shows unknown titles i the list (disabled, non-seleactable)",	--(optional)
+            requiresReload = true,
+            default = defaultSVs.showmissingtitles,
+		},
+		{
+			type    = "slider",
+			name    = "Shown entries in dropdown",
+			default = 16,
+            min = 3,
+            max = 30,
+			getFunc = function() return ImprovedTitleizer.savedVariables.visibleRowsDropdown end,
+			setFunc = function( newValue )
+              ImprovedTitleizer.savedVariables.visibleRowsDropdown = newValue
+              updateStatsTitleDropdownOptions()
+            end,
+            default = defaultSVs.visibleRowsDropdown,
+		},
+		{
+			type    = "slider",
+			name    = "Shown entries in submenus",
+			default = 16,
+            min = 3,
+            max = 30,
+			getFunc = function() return ImprovedTitleizer.savedVariables.visibleRowsSubmenu end,
+			setFunc = function( newValue )
+              ImprovedTitleizer.savedVariables.visibleRowsSubmenu = newValue
+              updateStatsTitleDropdownOptions()
+            end,
+            default = defaultSVs.visibleRowsSubmenu,
+		},
+	}
+	local LAM = LibAddonMenu2
+	LAM:RegisterAddonPanel(ImprovedTitleizer.Name .. "Options", menuOptions )
+	LAM:RegisterOptionControls(ImprovedTitleizer.Name .. "Options", dataTable )
 
 end
 

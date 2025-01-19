@@ -9,7 +9,7 @@ local ImprovedTitleizer = ImprovedTitleizer
 ImprovedTitleizer.Name = "ImprovedTitleizer"
 ImprovedTitleizer.DisplayName = "Improved Titleizer"
 ImprovedTitleizer.Author = "tomstock, Baertram, IsJustaGhost[, Kyoma]"
-ImprovedTitleizer.Version = "1.9.6"
+ImprovedTitleizer.Version = "1.10"
 
 ImprovedTitleizer.Debug = false --Todo: Change that to false before setting live, or else tooltips will contain an extra ID row at the end
 ImprovedTitleizer.titleDropdownRow = nil
@@ -452,7 +452,7 @@ local function InitializeTitles()
         end
         local name, description, points, icon, completed, date, time = GetAchievementInfo(id)
         -- Just used to test the new icon in LibScrollableMenu
-        --	if newTitles[name] == nil then newTitles[name] = true end
+        --  if newTitles[name] == nil then newTitles[name] = true end
         local playerHasTitle = false
         local playerTitleIndex = -1
         for j=1,GetNumTitles() do
@@ -769,6 +769,7 @@ local function OnLoad(eventCode, name)
     if ImprovedTitleizer.logger ~= nil then ImprovedTitleizer.logger:Info("Loading titles from saved variables.") end
     AllTitles=ImprovedTitleizer.savedVariables.titleDetails
   end
+
   if ImprovedTitleizer.savedVariables.sortbyachievecat == nil then
     ImprovedTitleizer.savedVariables.sortbyachievecat = defaultSVs.sortbyachievecat
   end
@@ -807,15 +808,15 @@ local function OnLoad(eventCode, name)
 
   EVENT_MANAGER:RegisterForEvent(ImprovedTitleizer.Name, EVENT_ACHIEVEMENT_AWARDED, OnAchievementsAwarded)
 
-	local menuOptions = {
-		type				 = "panel",
-		name				 = ImprovedTitleizer.Name,
-		displayName	 = ImprovedTitleizer.DisplayName,
-		author			 = ImprovedTitleizer.Author,
-		version			 = ImprovedTitleizer.Version,
-		registerForRefresh	= true,
-		registerForDefaults = true,
-	}
+  local menuOptions = {
+    type                = "panel",
+    name                = ImprovedTitleizer.Name,
+    displayName         = ImprovedTitleizer.DisplayName,
+    author              = ImprovedTitleizer.Author,
+    version             = ImprovedTitleizer.Version,
+    registerForRefresh  = true,
+    registerForDefaults = true,
+  }
 
 	local dataTable = {
 		{

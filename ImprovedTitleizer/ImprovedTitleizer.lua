@@ -9,9 +9,8 @@ local ImprovedTitleizer = ImprovedTitleizer
 ImprovedTitleizer.Name = "ImprovedTitleizer"
 ImprovedTitleizer.DisplayName = "Improved Titleizer"
 ImprovedTitleizer.Author = "tomstock, Baertram, IsJustaGhost[, Kyoma]"
-ImprovedTitleizer.Version = "1.9.6"
+ImprovedTitleizer.Version = "1.10"
 
-ImprovedTitleizer.Debug = false --Todo: Change that to false before setting live, or else tooltips will contain an extra ID row at the end
 ImprovedTitleizer.titleDropdownRow = nil
 
 local tins = table.insert
@@ -21,10 +20,17 @@ local tgetn = table.getn
 local LSM = LibScrollableMenu
 
 local defaultSVs = {
+  debug=false,
   sortbyachievecat = true,
   showmissingtitles = false,
   visibleRowsDropdown = 16,
   visibleRowsSubmenu = 16,
+  guiDebug={
+    lastX = 100,
+    lastY = 100,
+    width = 650,
+    height = 550,
+  }
 }
 
 ImprovedTitleizer.logger = nil
@@ -74,12 +80,13 @@ end
     --Rank = Sort override
   ==============================================
 --]]
-local AchievmentIdsCategories =
+ImprovedTitleizer.AchievmentIdsCategories =
 {
   {
     Name=GetString(SI_AVA_MENU_ALLIANCE_WAR_GROUP), --Alliance War
     Entries=
     {
+      --! Emperor tied to achievement 935.  No way for me to test how it works.
       {ID=92,Rank=1}, --Volunteer --Alliance War Volunteer
       {ID=93,Rank=2}, --Recruit --Alliance War Recruit
       {ID=94,Rank=3}, --Tyro --Alliance War Tyro
@@ -105,6 +112,16 @@ local AchievmentIdsCategories =
       {ID=113,Rank=23}, --Grand Warlord --Alliance War Grand Warlord
       {ID=114,Rank=24}, --Overlord --Alliance War Overlord
       {ID=705,Rank=25}, --Grand Overlord --Alliance War Grand Overlord
+    },
+  },
+  {
+    Name=GetString(SI_GROUPFINDERCATEGORY3), --Infinite Archive
+    Entries=
+    {
+      {ID=3759}, --Infinite Archive Conqueror-Inkslayer
+      {ID=3755}, --No Book Left Unread-The Well-Versed
+      {ID=3751}, --Infinite Archive Challenger-The Unending
+      {ID=4152}, --Triumphant Curator-Lexiluminous
     },
   },
   {
@@ -219,7 +236,12 @@ local AchievmentIdsCategories =
       {ID=4009}, --Oathsworn Pit Champion --the Vengeful
       {ID=3816}, --Lighting the Embers --Oathsworn
       {ID=3812}, --Scorched but Surviving --Pitmaster
-
+      {ID=4296}, --Lep Seclusa Champion-The Unflinching
+      {ID=4134}, --Sic Semper-Moth Trusted
+      {ID=4130}, --Dethroned Once More-The Unconquerable
+      {ID=4295}, --Exiled Redoubt Champion-Master Exorcist
+      {ID=4115}, --Revenge Breaker-The Just
+      {ID=4111}, --Squall Silencer-Peacemaker
     }
   },
   {
@@ -233,6 +255,7 @@ local AchievmentIdsCategories =
       {ID=2453}, --Tin Soldier --The Upper Crust
       {ID=2458}, --Empieror --Messy Business
       {ID=2587}, --Witch --Wicked Writ Witch
+      {ID=4031}, --Cake Devourer-Cake Connoisseur
     }
   },
   {
@@ -288,6 +311,18 @@ local AchievmentIdsCategories =
       {ID=3556}, --Eye of the Queen --Buried Bequest
       {ID=3671}, --Champion of Apocrypha -- Fate's Chosen
       {ID=3674}, --Hero of Necrom --Hero of Necrom
+      {ID=1444}, --Silencer-Silencer
+      {ID=1434}, --Bane of the Gold Coast-Bane of the Gold Coast
+      {ID=2658}, --A Hero's Song-Lunar Champion
+      {ID=1852}, --Champion of Vivec-Champion of Vivec
+      {ID=1879}, --Clanfriend-Clanfriend
+      {ID=2760}, --Shieldthane of Morthal-Shieldthane of Morthal
+      {ID=3055}, --Champion of Blackwood-Champion of Blackwood
+      {ID=3300}, --Champion of High Isle-Three Thrones' Defender
+      {ID=4043}, --Champion of the Gold Road-Pathfinder
+      {ID=3985}, --Inheritor of the Scholarium-Inheritor
+      {ID=2449}, --Elsweyr Defense Force Champion-Elsweyr Strategist
+      {ID=3950}, --Hero of the Gold Road-Hero of the Gold Road
     }
   },
   {
@@ -381,7 +416,7 @@ local AchievmentIdsCategories =
   Used function documentation
   ==============================================
 --]]
-local AllTitles={}
+ImprovedTitleizer.AllTitles={}
 
 --{TitleID=id, CategoryID=categoryId, CategoryName=categoryName,SubCategoryID=subCategory,SubCategoryName=subCategoryName,HasTitle=hasTitle}
 
@@ -425,7 +460,7 @@ local GetTitle                           = GetTitle -- I want original titles
 --]]
 local function InitializeTitles()
 
-  AllTitles = {}
+  ImprovedTitleizer.AllTitles = {}
   --[[
     ==============================================
     Gets title details for the specified achievement and adds to the array
@@ -452,7 +487,7 @@ local function InitializeTitles()
         end
         local name, description, points, icon, completed, date, time = GetAchievementInfo(id)
         -- Just used to test the new icon in LibScrollableMenu
-        --	if newTitles[name] == nil then newTitles[name] = true end
+        --  if newTitles[name] == nil then newTitles[name] = true end
         local playerHasTitle = false
         local playerTitleIndex = -1
         for j=1,GetNumTitles() do
@@ -462,7 +497,7 @@ local function InitializeTitles()
             break
           end
         end
-        tins(AllTitles,1,{AchievementID=id,TitleID=playerTitleIndex,Title=title,CategoryID=categoryId, CategoryName=categoryName,SubCategoryID=subCategory,SubCategoryName=subCategoryName,HasTitle=playerHasTitle,AchievementName=achieveName,AchievementDescription=description},1);
+        tins(ImprovedTitleizer.AllTitles,1,{AchievementID=id,TitleID=playerTitleIndex,Title=title,CategoryID=categoryId, CategoryName=categoryName,SubCategoryID=subCategory,SubCategoryName=subCategoryName,HasTitle=playerHasTitle,AchievementName=achieveName,AchievementDescription=description},1);
       end
       id = GetNextAchievementInLine(id)
     end
@@ -480,7 +515,7 @@ local function InitializeTitles()
       end
     end
   end
-  for i,sub in pairs(AchievmentIdsCategories) do
+  for i,sub in pairs(ImprovedTitleizer.AchievmentIdsCategories) do
     if (sub.Name==GetString(SI_AVA_MENU_ALLIANCE_WAR_GROUP)) then
       for j,rank in pairs(sub.Entries) do
         rank.Icon=GetAvARankIcon(j*2)
@@ -488,7 +523,7 @@ local function InitializeTitles()
     end
   end
   ImprovedTitleizer.savedVariables.numTitles = GetNumTitles()
-  ImprovedTitleizer.savedVariables.titleDetails = AllTitles
+  ImprovedTitleizer.savedVariables.titleDetails = ImprovedTitleizer.AllTitles
 end
 --[[
   ==============================================
@@ -507,10 +542,10 @@ local function ConstructTitleMenu()
   TitleCategories ={}
   local subMenus={}
 
-  for i,sub in pairs(AchievmentIdsCategories) do
+  for i,sub in pairs(ImprovedTitleizer.AchievmentIdsCategories) do
     subMenus[sub.Name]={Entries={},Categories={}}
   end
-  for i,vTitle in pairs(AllTitles) do
+  for i,vTitle in pairs(ImprovedTitleizer.AllTitles) do
 
     local titlePlaced = false
     local isEnabled = true
@@ -530,7 +565,7 @@ local function ConstructTitleMenu()
       title = title.."  #"..vTitle.TitleID.."  HasTitle:".. tostring(vTitle.HasTitle).."  CategoryID:"..tostring(vTitle.CategoryID)
     end
 
-    for k, vCategory in pairs(AchievmentIdsCategories) do
+    for k, vCategory in pairs(ImprovedTitleizer.AchievmentIdsCategories) do
       for j,q in pairs(vCategory.Entries) do
         if vTitle.AchievementID==q.ID and titlePlaced==false then
           if newTitles[vTitle.Title] then
@@ -741,6 +776,24 @@ local function SetupTitleEventManagement()
   wasAlreadyReplacingZO_StatsFuncs = true
 end
 
+
+local function SetupDebug()
+
+  if ImprovedTitleizer.savedVariables.debug == true then
+    ImprovedTitleizer.logger = LibDebugLogger.Create(ImprovedTitleizer.Name)
+    ImprovedTitleizer.logger:Info("Loaded logger")
+    SLASH_COMMANDS["/refreshtitles"] = function()
+      InitializeTitles()
+    end
+    SLASH_COMMANDS["/debugtitles"] = function()
+      ImprovedTitleizer.Imp_DebugToggle()
+    end
+  else
+    ImprovedTitleizer.logger = nil
+    SLASH_COMMANDS["/refreshtitles"] = nil
+    SLASH_COMMANDS["/debugtitles"] = nil
+  end
+end
 --[[
   ==============================================
   Plugin Initialization - cache titles where possible, recreate when necessary
@@ -767,13 +820,7 @@ local function OnLoad(eventCode, name)
     InitializeTitles()
   else
     if ImprovedTitleizer.logger ~= nil then ImprovedTitleizer.logger:Info("Loading titles from saved variables.") end
-    AllTitles=ImprovedTitleizer.savedVariables.titleDetails
-  end
-  if ImprovedTitleizer.savedVariables.sortbyachievecat == nil then
-    ImprovedTitleizer.savedVariables.sortbyachievecat = defaultSVs.sortbyachievecat
-  end
-  if ImprovedTitleizer.savedVariables.showmissingtitles == nil then
-    ImprovedTitleizer.savedVariables.showmissingtitles = defaultSVs.showmissingtitles
+    ImprovedTitleizer.AllTitles=ImprovedTitleizer.savedVariables.titleDetails
   end
 
   ImprovedTitleizer.savedVariables.lastversion = ImprovedTitleizer.Version
@@ -807,15 +854,15 @@ local function OnLoad(eventCode, name)
 
   EVENT_MANAGER:RegisterForEvent(ImprovedTitleizer.Name, EVENT_ACHIEVEMENT_AWARDED, OnAchievementsAwarded)
 
-	local menuOptions = {
-		type				 = "panel",
-		name				 = ImprovedTitleizer.Name,
-		displayName	 = ImprovedTitleizer.DisplayName,
-		author			 = ImprovedTitleizer.Author,
-		version			 = ImprovedTitleizer.Version,
-		registerForRefresh	= true,
-		registerForDefaults = true,
-	}
+  local menuOptions = {
+    type                = "panel",
+    name                = ImprovedTitleizer.DisplayName,
+    displayName         = ImprovedTitleizer.DisplayName,
+    author              = ImprovedTitleizer.Author,
+    version             = ImprovedTitleizer.Version,
+    registerForRefresh  = true,
+    registerForDefaults = true,
+  }
 
 	local dataTable = {
 		{
@@ -827,68 +874,60 @@ local function OnLoad(eventCode, name)
 		},
 		{
 			type    = "checkbox",
+			name    = "Debug",
+			getFunc = function() return ImprovedTitleizer.savedVariables.debug end,
+			setFunc = function( newValue ) ImprovedTitleizer.savedVariables.debug = newValue; SetupDebug(); end,
+		},
+		{
+			type = "divider",
+		},
+		{
+			type    = "checkbox",
 			name    = "Sort by Achievement Category",
-			default = true,
 			getFunc = function() return ImprovedTitleizer.savedVariables.sortbyachievecat end,
 			setFunc = function( newValue ) ImprovedTitleizer.savedVariables.sortbyachievecat = newValue; ConstructTitleMenu() end,
-            warning = "Sorts the achievements by it'S category and not by name",	--(optional)
-            requiresReload = true,
-            default = defaultSVs.sortbyachievecat,
+      warning = "Sorts the achievements by it'S category and not by name",	--(optional)
+      requiresReload = true,
 		},
 		{
 			type    = "checkbox",
 			name    = "Show missing titles",
-			default = true,
 			getFunc = function() return ImprovedTitleizer.savedVariables.showmissingtitles end,
 			setFunc = function( newValue ) ImprovedTitleizer.savedVariables.showmissingtitles = newValue; ConstructTitleMenu() end,
-            warning = "Shows unknown titles i the list (disabled, non-seleactable)",	--(optional)
-            requiresReload = true,
-            default = defaultSVs.showmissingtitles,
+      warning = "Shows unknown titles i the list (disabled, non-seleactable)",	--(optional)
+      requiresReload = true,
 		},
 		{
 			type    = "slider",
 			name    = "Shown entries in dropdown",
-			default = 16,
-            min = 3,
-            max = 30,
+      min = 3,
+      max = 30,
 			getFunc = function() return ImprovedTitleizer.savedVariables.visibleRowsDropdown end,
 			setFunc = function( newValue )
               ImprovedTitleizer.savedVariables.visibleRowsDropdown = newValue
               updateStatsTitleDropdownOptions()
             end,
-            default = defaultSVs.visibleRowsDropdown,
 		},
 		{
 			type    = "slider",
 			name    = "Shown entries in submenus",
-			default = 16,
-            min = 3,
-            max = 30,
+      min = 3,
+      max = 30,
 			getFunc = function() return ImprovedTitleizer.savedVariables.visibleRowsSubmenu end,
 			setFunc = function( newValue )
               ImprovedTitleizer.savedVariables.visibleRowsSubmenu = newValue
               updateStatsTitleDropdownOptions()
             end,
-            default = defaultSVs.visibleRowsSubmenu,
 		},
 	}
 	local LAM = LibAddonMenu2
 	LAM:RegisterAddonPanel(ImprovedTitleizer.Name .. "Options", menuOptions )
 	LAM:RegisterOptionControls(ImprovedTitleizer.Name .. "Options", dataTable )
 
+  ImprovedTitleizer.InitDebugGui()
+
+  SetupDebug()
 end
-
-
-
---[[
-  ==============================================
-  Slash Commands
-  ==============================================
---]]
-SLASH_COMMANDS["/refreshtitles"] = function()
-  InitializeTitles()
-end
-
 
 --[[
   ==============================================

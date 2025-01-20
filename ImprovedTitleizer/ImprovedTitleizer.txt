@@ -14,3 +14,5 @@
 ## DependsOn: LibAddonMenu-2.0>=37 LibScrollableMenu>=020300
 
 ImprovedTitleizer.lua
+IT_Debug.lua
+xml\debug.xml

@@ -23,9 +23,11 @@ Sample categories:
 - Tales of Tribute
 - Trials
 
+Known Issues:
+- Unable to test Emperor title.  Does not show as unknown.  Unable to verify if it is listed, when known.
+
 Required Pre-requisite Addon:
 LibAddonMenu-2.0
-LibCustomMenu
 LibScrollableMenu
 
 GitHub: https://github.com/tomstock1337/eso-ImprovedTitleizer

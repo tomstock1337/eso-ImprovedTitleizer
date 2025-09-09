@@ -9,7 +9,7 @@ local ImprovedTitleizer = ImprovedTitleizer
 ImprovedTitleizer.Name = "ImprovedTitleizer"
 ImprovedTitleizer.DisplayName = "Improved Titleizer"
 ImprovedTitleizer.Author = "tomstock, Baertram, IsJustaGhost[, Kyoma]"
-ImprovedTitleizer.Version = "1.11"
+ImprovedTitleizer.Version = "1.12"
 
 ImprovedTitleizer.titleDropdownRow = nil
 
@@ -230,18 +230,24 @@ ImprovedTitleizer.AchievmentIdsCategories =
       {ID=3535}, --Magnastylus in the Making --Curator's Champion
       {ID=3617}, --Bal Sunnar Champion --Shadow Blessed
       {ID=3618}, --Scrivener's Hall Champion --Scribe Savior
-      {ID=4010}, --Bedlam Veil Champion --the Intervener
-      {ID=3857}, --Unshakeable Fervor --Bedlam's Disciple
-      {ID=3853}, --Lithe and Clever --the Self-governing
-      {ID=4009}, --Oathsworn Pit Champion --the Vengeful
-      {ID=3816}, --Lighting the Embers --Oathsworn
       {ID=3812}, --Scorched but Surviving --Pitmaster
-      {ID=4296}, --Lep Seclusa Champion-The Unflinching
-      {ID=4134}, --Sic Semper-Moth Trusted
-      {ID=4130}, --Dethroned Once More-The Unconquerable
-      {ID=4295}, --Exiled Redoubt Champion-Master Exorcist
-      {ID=4115}, --Revenge Breaker-The Just
+      {ID=3816}, --Lighting the Embers --Oathsworn
+      {ID=3853}, --Lithe and Clever --the Self-governing
+      {ID=3857}, --Unshakeable Fervor --Bedlam's Disciple
+      {ID=4009}, --Oathsworn Pit Champion --the Vengeful
+      {ID=4010}, --Bedlam Veil Champion --the Intervener
       {ID=4111}, --Squall Silencer-Peacemaker
+      {ID=4115}, --Revenge Breaker-The Just
+      {ID=4130}, --Dethroned Once More-The Unconquerable
+      {ID=4134}, --Sic Semper-Moth Trusted
+      {ID=4295}, --Exiled Redoubt Champion-Master Exorcist
+      {ID=4296}, --Lep Seclusa Champion-The Unflinching
+      {ID=4313}, --Facing Mortality-Key Master
+      {ID=4317}, --Key to the Stone-Deathbringer
+      {ID=4328}, --Naj-Caldeesh Champion-The Crypt Singer
+      {ID=4336}, --Dispersive Defeat-Illustrious
+      {ID=4340}, --Cut Above the Rest-The Brilliant
+      {ID=4351}, --Black Gem Foundry Champion-Foundry's Foil
     }
   },
   {
@@ -279,50 +285,74 @@ ImprovedTitleizer.AchievmentIdsCategories =
   {
     Name=GetString(SI_GUILDACTIVITYATTRIBUTEVALUE6), --Questing
     Entries={
-      {ID=61}, --Covenant Hero --Hero of the Daggerfall Covenant
-      {ID=617}, --Pact Hero --Hero of the Ebonheart Pact
-      {ID=618}, --Dominion Hero --Hero of the Aldmeri Dominion
-      {ID=628}, --Tamriel Hero --Tamriel Expert Adventurer
       {ID=1248}, --Hero of Wrothgar --Hero of Wrothgar
       {ID=1260}, --Kingmaker --Kingmaker
+      {ID=1434}, --Bane of the Gold Coast-Bane of the Gold Coast
+      {ID=1444}, --Silencer-Silencer
+      {ID=1852}, --Champion of Vivec-Champion of Vivec
       {ID=1868}, --Savior of Morrowind --Savior of Morrowind
+      {ID=1879}, --Clanfriend-Clanfriend
       {ID=2049}, --Hero of Clockwork City --Hero of Clockwork City
+      {ID=2099}, --Relics of Summerset-Finder of Lost Relics
       {ID=2193}, --Savior of Summerset --Savior of Summerset
+      {ID=2194}, --The Good of the Many-Emissary
       {ID=2210}, --Mystic --Psijic Sage
       {ID=2325}, --Murkmire Prepper --Cyrodilic Collections Champion
       {ID=2331}, --Hero of Murkmire --Hero of Murkmire
+      {ID=2449}, --Elsweyr Defense Force Champion-Elsweyr Strategist
       {ID=2509}, --Savior of Elsweyr --Savior of Elsweyr
+      {ID=2522}, --Champion of Anequina-Champion of Anequina
       {ID=2604}, --Guardian of Elsweyr --Bright Moons Over Elsweyr
       {ID=2623}, --Hero of the Dragonguard --Hero of the Dragonguard
+      {ID=2658}, --A Hero's Song-Lunar Champion
       {ID=2712}, --Savior of Western Skyrim --Savior of Western Skyrim
+      {ID=2716}, --Champion of Solitude-Thane of Solitude
       {ID=2751}, --Dark Delver --Companion of Lyris Titanborn
+      {ID=2760}, --Shieldthane of Morthal-Shieldthane of Morthal
       {ID=2935}, --Champion of Markarth --Protector of Markarth
       {ID=2939}, --Hero of Skyrim --A Bridge Between Kingdoms
       {ID=2941}, --Guardian of the Reach --Savior of the Reach
       {ID=3047}, --Savior of Blackwood --Savior of Blackwood
+      {ID=3055}, --Champion of Blackwood-Champion of Blackwood
       {ID=3145}, --Hero of Fargrave --Hero of Fargrave
       {ID=3214}, --Cataclyst Breaker --Hopeful Rescuer
       {ID=3217}, --Champion of the Deadlands --Eternal Optimist
       {ID=3218}, --Hope's Hero --Friend to the Kalmur
       {ID=3219}, --The Wretched --Spire Sleuth
       {ID=3271}, --Savior of High Isle --Savior of High Isle
+      {ID=3300}, --Champion of High Isle-Three Thrones' Defender
+      {ID=3462}, --Flower of Chivalry-Knight Errant
+      {ID=3497}, --Volcanic Vanquisher-Mighty in Magma
       {ID=3501}, --Guardian of Galen --Savior of Galen
       {ID=3512}, --Sower's Savior --Firesong Extinguisher
       {ID=3556}, --Eye of the Queen --Buried Bequest
       {ID=3671}, --Champion of Apocrypha -- Fate's Chosen
       {ID=3674}, --Hero of Necrom --Hero of Necrom
-      {ID=1444}, --Silencer-Silencer
-      {ID=1434}, --Bane of the Gold Coast-Bane of the Gold Coast
-      {ID=2658}, --A Hero's Song-Lunar Champion
-      {ID=1852}, --Champion of Vivec-Champion of Vivec
-      {ID=1879}, --Clanfriend-Clanfriend
-      {ID=2760}, --Shieldthane of Morthal-Shieldthane of Morthal
-      {ID=3055}, --Champion of Blackwood-Champion of Blackwood
-      {ID=3300}, --Champion of High Isle-Three Thrones' Defender
-      {ID=4043}, --Champion of the Gold Road-Pathfinder
-      {ID=3985}, --Inheritor of the Scholarium-Inheritor
-      {ID=2449}, --Elsweyr Defense Force Champion-Elsweyr Strategist
       {ID=3950}, --Hero of the Gold Road-Hero of the Gold Road
+      {ID=3985}, --Inheritor of the Scholarium-Inheritor
+      {ID=4043}, --Champion of the Gold Road-Pathfinder
+      {ID=4406}, --Hero of Western Solstice-Champion of the Stirk Fellowship
+      {ID=61}, --Covenant Hero --Hero of the Daggerfall Covenant
+      {ID=617}, --Pact Hero --Hero of the Ebonheart Pact
+      {ID=618}, --Dominion Hero --Hero of the Aldmeri Dominion
+      {ID=628}, --Tamriel Hero --Tamriel Expert Adventurer
+      {ID=587}, --Anchors Away-Savior of Nirn
+      {ID=318}, --General Executioner-Daedric Lord Slayer
+      {ID=621}, --Anchor Devastator-Enemy of Coldharbour
+      {ID=627}, --Tamriel Master Cave Delver-Explorer
+    }
+  },
+  {
+    Name=GetString(SI_SKILLS_SUBCLASSING_ENTRY_NAME), --Sub Classing
+    Entries={
+      {ID=4353}, --Dragonknight Class Mastery-Dragon Master-at-Arms
+      {ID=4356}, --Sorcerer Class Mastery-Grand Sorcerer
+      {ID=4359}, --Arcanist Class Mastery-Archmage of Apocrypha
+      {ID=4357}, --Warden Class Mastery-Champion of the Green
+      {ID=4355}, --Nightblade Class Mastery-Dark Executioner
+      {ID=4354}, --Templar Class Mastery-Light's Champion
+      {ID=4358}, --Necromancer Class Mastery-Grand Necromancer
+      {ID=4352}, --Class Master of the Second Era-of the Second Era
     }
   },
   {
@@ -407,6 +437,11 @@ ImprovedTitleizer.AchievmentIdsCategories =
       {ID=4015}, --Lucent Citadel Conqueror --Crystal Sharp
       {ID=4013}, --Lucent Citadel Vanquisher --Luminous
       {ID=4020}, --Knot Worthy --Arcane Stabilizer
+      {ID=4272}, --Lord of Suffering-Misery's Master
+      {ID=4276}, --Served Suffering-Indomitable
+      {ID=4273}, --Worth the Pain-Cista Breaker
+      {ID=4266}, --Ossein Cage Vanquisher-Carnage Incarnate
+      {ID=4268}, --Ossein Cage Conqueror-The Agonizer
     }
   }
 }

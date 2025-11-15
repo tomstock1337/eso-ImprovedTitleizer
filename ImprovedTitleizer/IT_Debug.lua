@@ -54,29 +54,13 @@ function Imp.Imp_DebugRefresh()
   local isOrganized = false
 
   for _, item in ipairs(ImprovedTitleizer.AllTitles) do
-    isOrganized = false
-
-    for i,sub in pairs(ImprovedTitleizer.AchievmentIdsCategories) do
-      for j,q in pairs(sub.Entries) do
-        if q.ID == item.AchievementID then
-          isOrganized = true
-          break
-        end
-      end
-      if isOrganized then
-        break
-      end
+    local parts = {}
+    for k, v in pairs(item) do
+      table.insert(parts, tostring(k) .. '=' .. tostring(v))
     end
-    if not isOrganized then
-      if tos(item.CategoryName)..'-'..tos(item.SubCategoryName) ~= lastCat then
-        editCtrl:SetText(editCtrl:GetText() .. string.char(10) ..
-        "---------"..tos(item.CategoryName)..'-'..tos(item.SubCategoryName).."---------")
-        lastCat = tos(item.CategoryName)..'-'..tos(item.SubCategoryName)
-      end
-        editCtrl:SetText(editCtrl:GetText() .. string.char(10) ..
-            "{ID="..tos(item.AchievementID) .. "}, --"..tos(item.AchievementName)..'-'..tos(item.Title)..'$$$$$'..tos(item.AchievementDescription))
-      end
-    end
+    editCtrl:SetText(editCtrl:GetText() ..'{' .. table.concat(parts, ', ') .. '}\n')
+    d('{' .. table.concat(parts, ', ') .. '}')
+  end
 end
 
 function Imp.InitDebugGui()

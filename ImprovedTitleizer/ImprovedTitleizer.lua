@@ -9,7 +9,7 @@ local ImprovedTitleizer = ImprovedTitleizer
 ImprovedTitleizer.Name = "ImprovedTitleizer"
 ImprovedTitleizer.DisplayName = "Improved Titleizer"
 ImprovedTitleizer.Author = "tomstock, Baertram, IsJustaGhost[, Kyoma]"
-ImprovedTitleizer.Version = "1.12"
+ImprovedTitleizer.Version = "1.13"
 
 ImprovedTitleizer.titleDropdownRow = nil
 
@@ -556,6 +556,31 @@ local function InitializeTitles()
         rank.Icon=GetAvARankIcon(j*2)
       end
     end
+  end
+
+  for i = 1, GetNumTitles() do
+      local found = false
+      for _, entry in ipairs(ImprovedTitleizer.AllTitles) do
+          if entry.TitleID == i then
+              found = true
+              break
+          end
+      end
+      if not found then
+          local titleName = GetTitle(i)
+          table.insert(ImprovedTitleizer.AllTitles, {
+              AchievementID = -1, -- or set as appropriate
+              TitleID = i,
+              Title = titleName,
+              CategoryID = -1,
+              CategoryName = "No Achievement",
+              SubCategoryID = -1,
+              SubCategoryName = "",
+              HasTitle = true,
+              AchievementName = "No Achievement",
+              AchievementDescription = "No Achievement",
+          })
+      end
   end
   ImprovedTitleizer.savedVariables.numTitles = GetNumTitles()
   ImprovedTitleizer.savedVariables.titleDetails = ImprovedTitleizer.AllTitles

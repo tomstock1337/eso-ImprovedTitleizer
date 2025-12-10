@@ -9,7 +9,7 @@ local ImprovedTitleizer = ImprovedTitleizer
 ImprovedTitleizer.Name = "ImprovedTitleizer"
 ImprovedTitleizer.DisplayName = "Improved Titleizer"
 ImprovedTitleizer.Author = "tomstock, Baertram, IsJustaGhost[, Kyoma]"
-ImprovedTitleizer.Version = "1.13"
+ImprovedTitleizer.Version = "1.14"
 
 ImprovedTitleizer.titleDropdownRow = nil
 
@@ -797,7 +797,8 @@ local function SetupTitleEventManagement()
         control.scrollHelper = AddCustomScrollableComboBoxDropdownMenu(
                 self.control, --STATS.titleDropdownRow
                 comboBox,
-                {visibleRowsDropdown=sv.visibleRowsDropdown, visibleRowsSubmenu=sv.visibleRowsSubmenu, sortEntries=false}
+                {visibleRowsDropdown=sv.visibleRowsDropdown, visibleRowsSubmenu=sv.visibleRowsSubmenu, sortEntries=false,
+                 enableFilter=true, headerCollapsible=true, headerCollapsed=true} --show search editbox at header, but automatically collapse the header by default
         )
       end
       control.scrollHelper.OnShow = function() end --don't change parenting

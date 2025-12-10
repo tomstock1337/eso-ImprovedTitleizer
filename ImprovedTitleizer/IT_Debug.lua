@@ -2,6 +2,7 @@ ImprovedTitleizer = ImprovedTitleizer or {}
 local Imp = ImprovedTitleizer
 
 local tos = tostring
+local tcon = table.concat
 
 --[[
   Global Window Events
@@ -56,10 +57,10 @@ function Imp.Imp_DebugRefresh()
   for _, item in ipairs(ImprovedTitleizer.AllTitles) do
     local parts = {}
     for k, v in pairs(item) do
-      table.insert(parts, tostring(k) .. '=' .. tostring(v))
+      table.insert(parts, tos(k) .. '=' .. tos(v))
     end
-    editCtrl:SetText(editCtrl:GetText() ..'{' .. table.concat(parts, ', ') .. '}\n')
-    d('{' .. table.concat(parts, ', ') .. '}')
+    editCtrl:SetText(editCtrl:GetText() ..'{' .. tcon(parts, ', ') .. '}\n')
+    d('{' .. tcon(parts, ', ') .. '}')
   end
 end
 

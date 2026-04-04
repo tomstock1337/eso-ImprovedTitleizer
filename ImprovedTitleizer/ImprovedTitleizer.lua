@@ -9,7 +9,7 @@ local ImprovedTitleizer = ImprovedTitleizer
 ImprovedTitleizer.Name = "ImprovedTitleizer"
 ImprovedTitleizer.DisplayName = "Improved Titleizer"
 ImprovedTitleizer.Author = "tomstock, Baertram, IsJustaGhost[, Kyoma]"
-ImprovedTitleizer.Version = "1.15"
+ImprovedTitleizer.Version = "1.16"
 
 ImprovedTitleizer.titleDropdownRow = nil
 
